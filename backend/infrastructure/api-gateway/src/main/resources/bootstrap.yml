@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    config:
+      # Bootstrap configuration: pull parameters from Config Server
+      uri: ${SPRING_CLOUD_CONFIG_URI:http://localhost:8888}
+      fail-fast: true # Fail startup if config-server is unreachable

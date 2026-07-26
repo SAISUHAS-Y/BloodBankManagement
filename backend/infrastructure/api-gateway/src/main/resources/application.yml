@@ -1,0 +1,23 @@
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    urls:
+      - name: 1. Identity Service (Auth & Security)
+        url: /v3/api-docs/identity-service
+      - name: 2. Master Service (Reference Data)
+        url: /v3/api-docs/master-service
+      - name: 3. User Service (Donors & Staff)
+        url: /v3/api-docs/user-service
+      - name: 4. Hospital Service (Hospitals)
+        url: /v3/api-docs/hospital-service
+      - name: 5. Blood Bank Service (Inventory)
+        url: /v3/api-docs/blood-bank-service
+      - name: 6. Donation Service (Donation Records)
+        url: /v3/api-docs/donation-service
+      - name: 7. Transaction Service (Requests & Issuance)
+        url: /v3/api-docs/transaction-service
+      - name: 8. Notification Service (Templates & Logs)
+        url: /v3/api-docs/notification-service

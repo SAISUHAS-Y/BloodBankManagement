@@ -1,0 +1,6 @@
+server:
+  port: 8085
+
+spring:
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/blood_bank_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true

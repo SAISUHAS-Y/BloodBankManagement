@@ -1,0 +1,32 @@
+server:
+  port: 8761
+
+spring:
+  security:
+    user:
+      name: ${EUREKA_USERNAME:admin}
+      password: ${EUREKA_PASSWORD:admin123}
+
+eureka:
+  instance:
+    hostname: ${EUREKA_HOSTNAME:localhost}
+  client:
+    username: ${EUREKA_USERNAME:admin}
+    password: ${EUREKA_PASSWORD:admin123}
+    register-with-eureka: false
+    fetch-registry: false
+    service-url:
+      defaultZone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+      default-zone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+    serviceUrl:
+      defaultZone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+      default-zone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+  server:
+    enable-self-preservation: false
+    eviction-interval-timer-in-ms: 5000
+    wait-time-in-ms-when-sync-empty: 0
+
+management:
+  health:
+    eureka:
+      enabled: false

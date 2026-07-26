@@ -1,0 +1,22 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    active: native
+  cloud:
+    compatibility-verifier:
+      enabled: false
+    config:
+      server:
+        native:
+          # Search configs stored inside resources/shared-configs on the classpath
+          search-locations: ${SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS:classpath:/shared-configs,file:///app/config-repo}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

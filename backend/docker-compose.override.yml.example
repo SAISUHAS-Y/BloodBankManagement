@@ -1,0 +1,9 @@
+# Example Docker Compose Override file for local native microservice development.
+# Usage: Copy this file to docker-compose.override.yml to disable a specific container
+# (e.g., user-service) so you can run and debug it natively in your IDE (IntelliJ / Eclipse / VS Code).
+
+services:
+  # Disable user-service in Docker so you can run it locally in IDE on port 8087
+  user-service:
+    entrypoint: ["echo", "Service user-service disabled in Docker for local IDE debugging"]
+    restart: "no"

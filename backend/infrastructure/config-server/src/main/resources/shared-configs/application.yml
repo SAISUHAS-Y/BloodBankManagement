@@ -1,0 +1,86 @@
+# Centralized Shared Application Configuration
+# Automatically merged into downstream microservices pulling from Config Server
+
+spring:
+  cloud:
+    compatibility-verifier:
+      enabled: false
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${DB_NAME:bloodbank}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:saisuhas@421}
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      pool-name: HikariCP-Pool
+
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+
+# Centralized Eureka Client Registration (Authenticated)
+eureka:
+  client:
+    username: ${EUREKA_USERNAME:admin}
+    password: ${EUREKA_PASSWORD:admin123}
+    service-url:
+      defaultZone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+      default-zone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+    serviceUrl:
+      defaultZone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+      default-zone: http://${EUREKA_USERNAME:admin}:${EUREKA_PASSWORD:admin123}@${EUREKA_HOST:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+    eureka-service-url-poll-interval-seconds: 5
+    registry-fetch-interval-seconds: 5
+  instance:
+    prefer-ip-address: true
+    # Local Dev: Fast lease renewal and expiration for quick node failure detection
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 10
+    # Production Recommendation:
+    # lease-renewal-interval-in-seconds: 30
+    # lease-expiration-duration-in-seconds: 90
+
+# Actuator & Observability Expositions
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,refresh
+  endpoint:
+    health:
+      show-details: always
+  health:
+    eureka:
+      enabled: false
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  pattern:
+    level: "%5p [${spring.application.name:},%X{traceId:-NoTrace}]"
+
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true

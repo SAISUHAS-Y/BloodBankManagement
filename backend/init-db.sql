@@ -1,0 +1,11 @@
+-- Initialize dedicated databases for all microservices
+CREATE DATABASE IF NOT EXISTS identity_db;
+CREATE DATABASE IF NOT EXISTS master_db;
+CREATE DATABASE IF NOT EXISTS user_db;
+CREATE DATABASE IF NOT EXISTS hospital_db;
+CREATE DATABASE IF NOT EXISTS blood_bank_db;
+CREATE DATABASE IF NOT EXISTS donation_db;
+CREATE DATABASE IF NOT EXISTS transaction_db;
+CREATE DATABASE IF NOT EXISTS notification_db;
+
+FLUSH PRIVILEGES;
