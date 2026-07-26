@@ -52,6 +52,50 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @PostMapping("/admin/users/search")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse>>> searchUsers(
+            @Valid @RequestBody com.bloodbank.identity.application.dto.UserSearchRequest request) {
+        
+        com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse> response = adminService.searchUsers(request);
+        return ResponseEntity.ok(ApiResponse.success("Users search executed successfully", response));
+    }
+
+    @PostMapping("/admin/users/{id}/activate")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<Void>> activateUser(@PathVariable Long id) {
+        adminService.activateUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User activated successfully", null));
+    }
+
+    @PostMapping("/admin/users/{id}/deactivate")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<Void>> deactivateUser(@PathVariable Long id) {
+        adminService.deactivateUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User deactivated successfully", null));
+    }
+
+    @PostMapping("/admin/users/{id}/lock")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<Void>> lockUser(@PathVariable Long id) {
+        adminService.lockUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User locked successfully", null));
+    }
+
+    @PostMapping("/admin/users/{id}/unlock")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<Void>> unlockUser(@PathVariable Long id) {
+        adminService.unlockUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User unlocked successfully", null));
+    }
+
+    @PostMapping("/admin/users/{id}/suspend")
+    @HasPermission("USER_MANAGE")
+    public ResponseEntity<ApiResponse<Void>> suspendUser(@PathVariable Long id) {
+        adminService.suspendUser(id);
+        return ResponseEntity.ok(ApiResponse.success("User suspended successfully", null));
+    }
+
     @DeleteMapping("/admin/users/{id}")
     @HasPermission("USER_MANAGE")
     public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {

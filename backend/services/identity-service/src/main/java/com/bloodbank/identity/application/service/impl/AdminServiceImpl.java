@@ -156,6 +156,81 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse> searchUsers(com.bloodbank.identity.application.dto.UserSearchRequest request) {
+        org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(
+                "ASC".equalsIgnoreCase(request.getSortDirection()) ? org.springframework.data.domain.Sort.Direction.ASC : org.springframework.data.domain.Sort.Direction.DESC,
+                request.getSortBy() != null ? request.getSortBy() : "createdAt"
+        );
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(request.getPage(), request.getSize(), sort);
+        org.springframework.data.jpa.domain.Specification<User> spec = com.bloodbank.identity.domain.repository.specification.UserSpecifications.buildSearchSpecification(request);
+
+        org.springframework.data.domain.Page<User> userPage = userRepository.findAll(spec, pageable);
+
+        return com.bloodbank.common.core.dto.PageResponse.from(userPage, user -> {
+            Set<String> roles = getUserRoleNames(user);
+            Set<String> permissions = getUserPermissionCodes(user);
+            return buildUserSummary(user, roles, permissions);
+        });
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "user_summary", allEntries = true)
+    public void activateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.activate();
+        userRepository.save(user);
+        log.info("User [{}] status set to ACTIVE", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "user_summary", allEntries = true)
+    public void deactivateUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.deactivate();
+        userRepository.save(user);
+        log.info("User [{}] status set to DEACTIVATED", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "user_summary", allEntries = true)
+    public void lockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.lockAccount(Instant.now().plus(24, java.time.temporal.ChronoUnit.HOURS));
+        userRepository.save(user);
+        log.info("User [{}] locked by admin", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "user_summary", allEntries = true)
+    public void unlockUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.unlockAccount();
+        userRepository.save(user);
+        log.info("User [{}] unlocked by admin", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "user_summary", allEntries = true)
+    public void suspendUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
+        user.suspend();
+        userRepository.save(user);
+        log.info("User [{}] status set to SUSPENDED", user.getUsername());
+    }
+
+    @Override
     @Transactional
     @CacheEvict(value = "user_summary", allEntries = true)
     public void deleteUser(Long id) {

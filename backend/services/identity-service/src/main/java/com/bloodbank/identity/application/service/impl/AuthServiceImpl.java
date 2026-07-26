@@ -12,11 +12,15 @@ import com.bloodbank.identity.application.dto.LoginRequest;
 import com.bloodbank.identity.application.dto.LoginResponse;
 import com.bloodbank.identity.application.dto.RefreshTokenRequest;
 import com.bloodbank.identity.application.service.AuthService;
+import com.bloodbank.identity.application.dto.ForgotPasswordRequest;
+import com.bloodbank.identity.application.dto.ResetPasswordRequest;
+import com.bloodbank.identity.application.dto.VerifyEmailRequest;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import com.bloodbank.identity.domain.entity.PasswordHistory;
 import com.bloodbank.identity.domain.entity.RefreshToken;
 import com.bloodbank.identity.domain.entity.User;
 import com.bloodbank.identity.domain.entity.UserRole;
+import com.bloodbank.identity.domain.entity.VerificationToken;
 import com.bloodbank.identity.domain.enums.AuthEventType;
 import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
 import com.bloodbank.identity.domain.repository.PasswordHistoryRepository;
@@ -24,6 +28,7 @@ import com.bloodbank.identity.domain.repository.RolePermissionRepository;
 import com.bloodbank.identity.domain.repository.RefreshTokenRepository;
 import com.bloodbank.identity.domain.repository.UserRepository;
 import com.bloodbank.identity.domain.repository.UserRoleRepository;
+import com.bloodbank.identity.domain.repository.VerificationTokenRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,6 +56,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRoleRepository userRoleRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
+    private final VerificationTokenRepository verificationTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final SecurityAuditLogger securityAuditLogger;
@@ -311,6 +317,82 @@ public class AuthServiceImpl implements AuthService {
 
         writeAuditLog(user.getId(), AuthEventType.PASSWORD_CHANGED, "N/A", "N/A",
                 "{\"status\": \"Password updated, all sessions terminated\"}");
+    }
+
+    @Override
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+        User user = userRepository.findByEmail(request.getEmail()).orElse(null);
+        if (user == null) {
+            log.info("Forgot password requested for non-existent email: {}", request.getEmail());
+            return;
+        }
+
+        String rawToken = UUID.randomUUID().toString();
+        String tokenHash = hashToken(rawToken);
+
+        VerificationToken token = new VerificationToken();
+        token.setUserId(user.getId());
+        token.setTokenHash(tokenHash);
+        token.setTokenType("PASSWORD_RESET");
+        token.setTargetDestination(user.getEmail());
+        token.setExpiresAt(Instant.now().plus(1, ChronoUnit.HOURS));
+        verificationTokenRepository.save(token);
+
+        log.info("Generated password reset token [{}] for user [{}]", rawToken, user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        String tokenHash = hashToken(request.getToken());
+        VerificationToken vToken = verificationTokenRepository.findByTokenHashAndTokenType(tokenHash, "PASSWORD_RESET")
+                .orElseThrow(() -> new InvalidInputException("Invalid or expired password reset token"));
+
+        if (vToken.isUsed() || vToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new InvalidInputException("Password reset token has expired or already been used");
+        }
+
+        User user = userRepository.findById(vToken.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        String newPasswordHash = passwordEncoder.encode(request.getNewPassword());
+        user.setPasswordHash(newPasswordHash);
+        user.setMustChangePassword(false);
+        userRepository.save(user);
+
+        vToken.setUsed(true);
+        verificationTokenRepository.save(vToken);
+
+        PasswordHistory historyRecord = new PasswordHistory();
+        historyRecord.setUserId(user.getId());
+        historyRecord.setPasswordHash(newPasswordHash);
+        passwordHistoryRepository.save(historyRecord);
+
+        log.info("Password reset successfully for user [{}]", user.getUsername());
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmail(VerifyEmailRequest request) {
+        String tokenHash = hashToken(request.getToken());
+        VerificationToken vToken = verificationTokenRepository.findByTokenHashAndTokenType(tokenHash, "EMAIL_VERIFICATION")
+                .orElseThrow(() -> new InvalidInputException("Invalid email verification token"));
+
+        if (vToken.isUsed() || vToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new InvalidInputException("Verification token has expired or already been used");
+        }
+
+        User user = userRepository.findById(vToken.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        vToken.setUsed(true);
+        verificationTokenRepository.save(vToken);
+
+        log.info("Email verified successfully for user [{}]", user.getUsername());
     }
 
     private void writeAuditLog(Long userId, AuthEventType eventType, String ipAddress, String userAgent,

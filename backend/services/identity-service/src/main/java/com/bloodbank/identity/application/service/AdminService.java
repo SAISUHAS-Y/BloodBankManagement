@@ -7,6 +7,9 @@ import com.bloodbank.identity.application.dto.RoleRequest;
 import com.bloodbank.identity.application.dto.RoleResponse;
 import com.bloodbank.identity.application.dto.PermissionResponse;
 
+import com.bloodbank.common.core.dto.PageResponse;
+import com.bloodbank.identity.application.dto.UserSearchRequest;
+
 import java.util.List;
 
 public interface AdminService {
@@ -14,7 +17,14 @@ public interface AdminService {
     UserSummaryResponse getUserById(Long id);
     UserSummaryResponse getUserSummaryByUsername(String username);
     List<UserSummaryResponse> getAllUsers();
+    PageResponse<UserSummaryResponse> searchUsers(UserSearchRequest request);
     void deleteUser(Long id);
+
+    void activateUser(Long id);
+    void deactivateUser(Long id);
+    void lockUser(Long id);
+    void unlockUser(Long id);
+    void suspendUser(Long id);
 
     RoleResponse createRole(RoleRequest request);
     List<RoleResponse> getAllRoles();
