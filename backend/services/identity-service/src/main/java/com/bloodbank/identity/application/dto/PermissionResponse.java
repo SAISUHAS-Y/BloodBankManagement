@@ -12,6 +12,9 @@ import lombok.NoArgsConstructor;
 public class PermissionResponse {
     private Long id;
     private String code;
+    private String displayName;
     private String description;
     private String module;
+    private String category;
+    private String permissionGroup;
 }
