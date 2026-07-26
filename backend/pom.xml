@@ -27,6 +27,7 @@
         <lombok.version>1.18.46</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <jjwt.version>0.12.6</jjwt.version>
+        <nimbus-jose-jwt.version>9.40</nimbus-jose-jwt.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <jakarta-validation.version>3.0.2</jakarta-validation.version>
 
@@ -190,6 +191,13 @@
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${jjwt.version}</version>
                 <scope>runtime</scope>
+            </dependency>
+
+            <!-- Nimbus JOSE JWT -->
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>nimbus-jose-jwt</artifactId>
+                <version>${nimbus-jose-jwt.version}</version>
             </dependency>
 
             <!-- Logstash Logback Encoder for JSON logging -->

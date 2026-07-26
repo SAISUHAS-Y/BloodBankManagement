@@ -13,11 +13,13 @@ import com.bloodbank.identity.application.dto.LoginResponse;
 import com.bloodbank.identity.application.dto.RefreshTokenRequest;
 import com.bloodbank.identity.application.service.AuthService;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
+import com.bloodbank.identity.domain.entity.PasswordHistory;
 import com.bloodbank.identity.domain.entity.RefreshToken;
 import com.bloodbank.identity.domain.entity.User;
 import com.bloodbank.identity.domain.entity.UserRole;
 import com.bloodbank.identity.domain.enums.AuthEventType;
 import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
+import com.bloodbank.identity.domain.repository.PasswordHistoryRepository;
 import com.bloodbank.identity.domain.repository.RolePermissionRepository;
 import com.bloodbank.identity.domain.repository.RefreshTokenRepository;
 import com.bloodbank.identity.domain.repository.UserRepository;
@@ -48,6 +50,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthAuditLogRepository authAuditLogRepository;
     private final UserRoleRepository userRoleRepository;
     private final RolePermissionRepository rolePermissionRepository;
+    private final PasswordHistoryRepository passwordHistoryRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final SecurityAuditLogger securityAuditLogger;
@@ -270,9 +273,34 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidInputException("Current password does not match");
         }
 
-        user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+        // Password complexity enforcement
+        String newPassword = request.getNewPassword();
+        if (newPassword == null || newPassword.length() < 8) {
+            throw new InvalidInputException("New password must be at least 8 characters long");
+        }
+
+        // Historical password retention check (NIST 800-63B standard: prevent reuse of last 5 passwords)
+        List<PasswordHistory> pastPasswords = passwordHistoryRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+        List<PasswordHistory> recentPasswords = pastPasswords.stream().limit(5).toList();
+        for (PasswordHistory history : recentPasswords) {
+            if (passwordEncoder.matches(newPassword, history.getPasswordHash())) {
+                throw new InvalidInputException("Password matches a recently used password. Please choose a different password.");
+            }
+        }
+        if (passwordEncoder.matches(newPassword, user.getPasswordHash())) {
+            throw new InvalidInputException("New password cannot be identical to current password.");
+        }
+
+        String newPasswordHash = passwordEncoder.encode(newPassword);
+        user.setPasswordHash(newPasswordHash);
         user.setMustChangePassword(false);
         userRepository.save(user);
+
+        // Record into Password History ledger
+        PasswordHistory historyRecord = new PasswordHistory();
+        historyRecord.setUserId(user.getId());
+        historyRecord.setPasswordHash(newPasswordHash);
+        passwordHistoryRepository.save(historyRecord);
 
         List<RefreshToken> activeTokens = refreshTokenRepository.findByUserIdAndRevokedFalse(user.getId());
         activeTokens.forEach(t -> {

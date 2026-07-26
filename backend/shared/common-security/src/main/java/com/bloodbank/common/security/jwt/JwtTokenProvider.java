@@ -76,13 +76,31 @@ public class JwtTokenProvider {
                 this.symmetricKey = Keys.hmacShaKeyFor(keyBytes);
                 log.info("JWT Token Provider initialized using HS256 (Symmetric HMAC).");
             } else {
-                this.symmetricKey = Jwts.SIG.HS256.key().build();
-                log.warn("No JWT configuration provided. Initialized with temporary in-memory HS256 key.");
+                java.security.KeyPairGenerator keyPairGenerator = java.security.KeyPairGenerator.getInstance("RSA");
+                keyPairGenerator.initialize(2048);
+                java.security.KeyPair keyPair = keyPairGenerator.generateKeyPair();
+                this.privateKey = keyPair.getPrivate();
+                this.publicKey = keyPair.getPublic();
+                this.useAsymmetric = true;
+                this.publicKeyMap.put(activeKeyId, this.publicKey);
+                log.info("No JWT key configuration provided. Dynamically generated RSA 2048-bit keypair for RS256 signing with kid '{}'.", activeKeyId);
             }
         } catch (Exception e) {
             log.error("Failed to initialize JWT Token Provider keys", e);
             throw new IllegalStateException("Failed to initialize JWT keys", e);
         }
+    }
+
+    public PublicKey getPublicKey() {
+        return this.publicKey;
+    }
+
+    public java.security.interfaces.RSAPublicKey getRSAPublicKey() {
+        return (this.publicKey instanceof java.security.interfaces.RSAPublicKey rsaKey) ? rsaKey : null;
+    }
+
+    public String getActiveKeyId() {
+        return this.activeKeyId;
     }
 
     private String cleanKey(String key) {
