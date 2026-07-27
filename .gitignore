@@ -29,3 +29,6 @@ logs/
 .agents/
 AGENTS.md
 
+# Personal documentation (do not track)
+business_requirements.md
+technical_architecture.md
