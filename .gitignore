@@ -24,3 +24,7 @@ logs/
 
 # Environment & credentials (if any)
 *.env
+
+# Rule set
+.agents/
+
