@@ -1,4 +1,4 @@
-# 🩸 Blood Bank Management System (Enterprise Microservices Platform)
+# 🩸 Blood Bank Management System (Microservices Platform)
 
 An enterprise-grade, distributed, event-driven microservices architecture built with **Java 25 (LTS)**, **Spring Boot 4.1.0**, **Spring Cloud 2025.1.1 (Oakwood)**, **MySQL**, **Redis**, **RabbitMQ**, **Zipkin**, and **Spring Cloud Netflix Eureka**.
 
