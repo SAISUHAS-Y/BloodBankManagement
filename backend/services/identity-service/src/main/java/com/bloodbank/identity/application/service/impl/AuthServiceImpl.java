@@ -45,6 +45,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import com.bloodbank.identity.domain.repository.UserMfaSecretRepository;
+import com.bloodbank.identity.application.service.MfaService;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -57,6 +60,8 @@ public class AuthServiceImpl implements AuthService {
     private final RolePermissionRepository rolePermissionRepository;
     private final PasswordHistoryRepository passwordHistoryRepository;
     private final VerificationTokenRepository verificationTokenRepository;
+    private final UserMfaSecretRepository mfaSecretRepository;
+    private final MfaService mfaService;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final SecurityAuditLogger securityAuditLogger;
@@ -113,6 +118,17 @@ public class AuthServiceImpl implements AuthService {
             user.setLocked(false);
             user.setLastLoginAt(Instant.now());
             userRepository.save(user);
+
+            // MFA Challenge Check
+            if (mfaSecretRepository.existsByUserIdAndMfaEnabledTrue(user.getId())) {
+                String mfaToken = mfaService.generateMfaTransactionToken(user.getId(), user.getUsername());
+                writeAuditLog(user.getId(), AuthEventType.LOGIN_SUCCESS, ipAddress, userAgent,
+                        "{\"status\": \"Primary credentials verified, MFA challenge issued\"}");
+                return LoginResponse.builder()
+                        .mfaRequired(true)
+                        .mfaToken(mfaToken)
+                        .build();
+            }
         } else {
             int failedAttempts = user.getFailedLoginAttempts() + 1;
             user.setFailedLoginAttempts(failedAttempts);

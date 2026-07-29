@@ -20,6 +20,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
 
+import com.bloodbank.identity.application.dto.MfaVerifyRequest;
+import com.bloodbank.identity.application.service.MfaService;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ import java.security.Principal;
 public class AuthController {
 
     private final AuthService authService;
+    private final MfaService mfaService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
@@ -40,6 +44,22 @@ public class AuthController {
         
         return new ResponseEntity<>(
                 ApiResponse.success("Login successful", response),
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/verify-mfa")
+    public ResponseEntity<ApiResponse<LoginResponse>> verifyMfa(
+            @Valid @RequestBody MfaVerifyRequest request,
+            HttpServletRequest httpServletRequest) {
+
+        String ipAddress = getClientIp(httpServletRequest);
+        String userAgent = httpServletRequest.getHeader("User-Agent");
+
+        LoginResponse response = mfaService.verifyMfaAndCompleteLogin(request, ipAddress, userAgent);
+
+        return new ResponseEntity<>(
+                ApiResponse.success("MFA verification successful", response),
                 HttpStatus.OK
         );
     }

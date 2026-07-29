@@ -13,6 +13,9 @@ import lombok.NoArgsConstructor;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
-    private long expiresIn;
+    private String tokenType;
+    private long expiresInMs;
+    private boolean mfaRequired;
+    private String mfaToken;
     private UserSummaryResponse user;
 }
