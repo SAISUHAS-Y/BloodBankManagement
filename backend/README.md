@@ -1,69 +1,58 @@
-# Blood Bank Management System - Backend
+# 🩸 Blood Bank Management System - Backend Platform
 
-Welcome to the backend architecture for the **Blood Bank Management System**. This system is built using a Java Spring Boot microservices architecture, implementing Clean Architecture patterns and production-grade infrastructure tooling.
-
----
-
-## 🛠️ Tech Stack & Versions
-*   **Java**: 25 (LTS)
-*   **Spring Boot**: 4.1.0
-*   **Spring Cloud**: 2025.1.1 "Oakwood"
-*   **Data Tier**: MySQL 9.x, Redis 8.x, Flyway Migrations, Spring Data JPA + Hibernate
-*   **Messaging**: RabbitMQ 4.x
-*   **Security**: Spring Security 6 + JJWT (Asymmetric RS256 token verification)
-*   **Boilerplate & Mapping**: Lombok 1.18.36, MapStruct 1.6.3
-*   **Observability**: Spring Boot Actuator, Micrometer, OpenTelemetry
+Welcome to the backend architecture for the **Blood Bank Management System**. Built on Java 25 and Spring Boot 4.1.0, this distributed system uses a microservices architecture with clean modular boundaries, event-driven messaging via RabbitMQ, Outbox pattern transactional guarantees, and centralized Security & Discovery.
 
 ---
 
-## 📂 Project Architecture
+## 🛠️ Technology Stack
 
-The project is organized as a multi-module Maven structure under the `backend/` root directory. Each microservice follows a Clean Architecture design with three sub-modules:
-1.  **`-api`**: Spring boot bootstrap, REST controllers, and Security filters.
-2.  **`-application`**: Business services, DTOs, and mapping layers (infrastructure-independent).
-3.  **`-infrastructure`**: JPA entities, repositories, service implementations, message publishers, and migrations.
-
----
-
-## 🗺️ System Modules Directory & Port Mapping
-
-| Module Name | Path | Port | Status | Description |
-| :--- | :--- | :---: | :---: | :--- |
-| **`common-core`** | [shared/common-core/](shared/common-core) | N/A | `COMPLETED` | Shared constants, ApiResponse wrappers, Page response helpers, and BaseEntity. |
-| **`common-exception`** | [shared/common-exception/](shared/common-exception) | N/A | `COMPLETED` | Centralized exception hierarchy and RestControllerAdvice. |
-| **`common-contracts`** | [shared/common-contracts/](shared/common-contracts) | N/A | `COMPLETED` | Shared DTOs for Feign cross-service communications (JPA-free). |
-| **`common-security`** | [shared/common-security/](shared/common-security) | N/A | `COMPLETED` | JWT utilities (Symmetric/Asymmetric), permission annotation, and security filters. |
-| **`common-events`** | [shared/common-events/](shared/common-events) | N/A | `COMPLETED` | RabbitMQ event envelopes, marker interfaces, and concrete events. |
-| **`common-logging`** | [shared/common-logging/](shared/common-logging) | N/A | `COMPLETED` | MDC correlation filter and ELK-compatible JSON log configuration profiles. |
-| **`config-server`** | [infrastructure/config-server/](infrastructure/config-server) | `8888` | `COMPLETED` | Centralized config server serving native profile configurations. |
-| **`discovery-server`**| [infrastructure/discovery-server/](infrastructure/discovery-server) | `8761` | `COMPLETED` | Eureka service registry with optimized dev configurations. |
-| **`api-gateway`** | [infrastructure/api-gateway/](infrastructure/api-gateway) | `8080` | `COMPLETED` | Routing gateway with dynamic JWT parsing, rate limiting, and CORS. |
+* **Core Platform:** Java 25 (LTS), Spring Boot 4.1.0, Spring Cloud 2025.1.1 (Oakwood)
+* **Data Tier:** MySQL 8.x/9.x, Redis 8.x, Flyway Migrations, Spring Data JPA + Hibernate
+* **Messaging & Events:** RabbitMQ 4.x (Transactional Outbox Pattern)
+* **Security & Token Discovery:** Spring Security 6 + JWT (HS256/RS256 Signature Verification, JWKS Key Discovery)
+* **API Documentation:** SpringDoc OpenAPI 3.1, Swagger UI (Centralized Aggregation)
+* **Observability:** Spring Boot Actuator, Micrometer, OpenTelemetry, Zipkin Distributed Tracing
 
 ---
 
-## 🚀 Running the System Locally
+## 🗺️ Microservices Topology & Port Directory
 
-### Step 1: Build all Maven Modules
-Compile and package the shared libraries and infrastructure jars:
-```bash
+| Module / Service Name | Relative Path | Port | Description |
+| :--- | :--- | :---: | :--- |
+| **`config-server`** | [`infrastructure/config-server`](infrastructure/config-server) | `8888` | Centralized Spring Cloud Config Server serving shared YAML profiles. |
+| **`discovery-server`** | [`infrastructure/discovery-server`](infrastructure/discovery-server) | `8761` | Eureka Service Registry for service discovery. |
+| **`api-gateway`** | [`infrastructure/api-gateway`](infrastructure/api-gateway) | `8080` | Reactive API Gateway with CORS, JWT security filter, and Swagger UI aggregation. |
+| **`identity-service`** | [`services/identity-service`](services/identity-service) | `8081` | User Authentication, MFA (2FA), RBAC Role Governance, Permission Matrix, Active Sessions, and Security Audit Logs. |
+| **`master-service`** | [`services/master-service`](services/master-service) | `8082` | Reference Master Data (Blood Groups, Component Types, Geographical Regions). |
+| **`user-service`** | [`services/user-service`](services/user-service) | `8083` | User Profiles, Donor Registration, and Medical Profile Details. |
+| **`hospital-service`** | [`services/hospital-service`](services/hospital-service) | `8084` | Hospital Directory, Staff Assignments, and Request Initiation. |
+| **`blood-bank-service`** | [`services/blood-bank-service`](services/blood-bank-service) | `8085` | Blood Bank Directory, Unit Storage, and Real-time Inventory Management. |
+| **`donation-service`** | [`services/donation-service`](services/donation-service) | `8086` | Blood Donation Tracking, Eligibility Checks, and Collection Logs. |
+| **`transaction-service`** | [`services/transaction-service`](services/transaction-service) | `8087` | Blood Request Processing, Cross-matching, Unit Allocation, and Fulfillment. |
+| **`notification-service`** | [`services/notification-service`](services/notification-service) | `8088` | Asynchronous Email/SMS/In-App Notifications via RabbitMQ. |
+
+---
+
+## 🧰 Shared Libraries (`/backend/shared`)
+
+* **`common-core`:** Standard Base Entity, envelope DTO (`ApiResponse<T>`), and validation annotations.
+* **`common-security`:** JWT token verification filter, SecurityContext parser, and `@HasPermission` AOP aspect.
+* **`common-contracts`:** Shared inter-service request/response contracts and Feign client interfaces.
+* **`common-events`:** Outbox Pattern implementation (`EventOutbox`), RabbitMQ publisher, and event payloads.
+* **`common-exception`:** Unified `GlobalExceptionHandler` and domain exception hierarchy.
+* **`common-logging`:** Logstash JSON log formatter, MDC correlation ID propagation, and performance tracing.
+
+---
+
+## ⚡ Quick Start Guide
+
+```powershell
+# 1. Build backend reactor
 mvn clean package -DskipTests
-```
 
-### Step 2: Boot Containers via Docker Compose
-Start MySQL, Redis, RabbitMQ, and the infrastructure microservices in their correct boot order:
-```bash
+# 2. Run infrastructure containers
 docker-compose up -d
+
+# 3. Access Swagger UI API Documentation
+# Gateway Unified Swagger UI: http://localhost:8080/swagger-ui.html
 ```
-
-To view logs for specific components:
-```bash
-docker-compose logs -f config-server
-docker-compose logs -f discovery-server
-docker-compose logs -f api-gateway
-```
-
-### Step 3: Verify Statuses
-* **Config Server**: Open `http://localhost:8888/api-gateway/default` to inspect loaded configs.
-* **Discovery Server**: Open Eureka Dashboard at `http://localhost:8761` to verify active registrations.
-* **API Gateway**: Verify routing by calling Gateway endpoints (e.g., `http://localhost:8080/actuator/health`).
-
