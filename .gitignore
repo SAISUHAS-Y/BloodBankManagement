@@ -1,8 +1,12 @@
-# Target build directories
+# =========================
+# Build Directories
+# =========================
 **/target/
 target/
 
-# IDE & Editor files
+# =========================
+# IDE & Editor Files
+# =========================
 .idea/
 *.iml
 *.ipr
@@ -12,15 +16,28 @@ target/
 .classpath
 .project
 
-# OS generated files
+# =========================
+# OS Generated Files
+# =========================
 .DS_Store
 Thumbs.db
 
-# Logs and temporary files
+# =========================
+# Logs & Temporary Files
+# =========================
 *.log
 logs/
 *.tmp
 *.temp
 
-# Environment & credentials (if any)
+# =========================
+# Environment & Credentials
+# =========================
 *.env
+
+# =========================
+# Documentation (Local Only)
+# =========================
+.agents/
+business_requirements.md
+technical_architecture.md
