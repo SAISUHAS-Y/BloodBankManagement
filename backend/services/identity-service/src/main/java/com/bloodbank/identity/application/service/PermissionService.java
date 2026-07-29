@@ -17,8 +17,4 @@ public interface PermissionService {
     List<String> getAllModules();
 
     Map<String, List<PermissionResponse>> getPermissionsGroupedByModule();
-
-    void validatePermissionDependencies(List<Long> permissionIds);
-
-    void addPermissionDependency(Long permissionId, Long dependsOnPermissionId);
 }

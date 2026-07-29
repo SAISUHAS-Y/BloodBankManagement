@@ -1,15 +1,11 @@
 package com.bloodbank.identity.application.service.impl;
 
-import com.bloodbank.common.exception.InvalidInputException;
-import com.bloodbank.common.exception.ResourceNotFoundException;
 import com.bloodbank.identity.application.dto.PermissionMatrixResponse;
 import com.bloodbank.identity.application.dto.PermissionResponse;
 import com.bloodbank.identity.application.service.PermissionService;
 import com.bloodbank.identity.domain.entity.Permission;
-import com.bloodbank.identity.domain.entity.PermissionDependency;
 import com.bloodbank.identity.domain.entity.Role;
 import com.bloodbank.identity.domain.entity.RolePermission;
-import com.bloodbank.identity.domain.repository.PermissionDependencyRepository;
 import com.bloodbank.identity.domain.repository.PermissionRepository;
 import com.bloodbank.identity.domain.repository.RolePermissionRepository;
 import com.bloodbank.identity.domain.repository.RoleRepository;
@@ -33,7 +29,6 @@ public class PermissionServiceImpl implements PermissionService {
     private final PermissionRepository permissionRepository;
     private final RoleRepository roleRepository;
     private final RolePermissionRepository rolePermissionRepository;
-    private final PermissionDependencyRepository permissionDependencyRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -115,47 +110,6 @@ public class PermissionServiceImpl implements PermissionService {
     public Map<String, List<PermissionResponse>> getPermissionsGroupedByModule() {
         return getAllPermissions().stream()
                 .collect(Collectors.groupingBy(PermissionResponse::getModule));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public void validatePermissionDependencies(List<Long> permissionIds) {
-        if (permissionIds == null || permissionIds.isEmpty()) {
-            return;
-        }
-
-        Set<Long> assignedSet = new HashSet<>(permissionIds);
-        List<PermissionDependency> dependencies = permissionDependencyRepository.findByPermissionIdIn(permissionIds);
-
-        for (PermissionDependency dep : dependencies) {
-            if (!assignedSet.contains(dep.getDependsOnPermissionId())) {
-                Permission perm = permissionRepository.findById(dep.getPermissionId()).orElse(null);
-                Permission reqPerm = permissionRepository.findById(dep.getDependsOnPermissionId()).orElse(null);
-
-                String permName = perm != null ? perm.getCode() : String.valueOf(dep.getPermissionId());
-                String reqName = reqPerm != null ? reqPerm.getCode() : String.valueOf(dep.getDependsOnPermissionId());
-
-                throw new InvalidInputException(
-                        String.format("Permission [%s] requires missing prerequisite permission [%s]", permName, reqName)
-                );
-            }
-        }
-    }
-
-    @Override
-    @Transactional
-    public void addPermissionDependency(Long permissionId, Long dependsOnPermissionId) {
-        Permission perm = permissionRepository.findById(permissionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Permission not found with ID: " + permissionId));
-        Permission reqPerm = permissionRepository.findById(dependsOnPermissionId)
-                .orElseThrow(() -> new ResourceNotFoundException("Prerequisite permission not found with ID: " + dependsOnPermissionId));
-
-        PermissionDependency dep = new PermissionDependency();
-        dep.setPermissionId(perm.getId());
-        dep.setDependsOnPermissionId(reqPerm.getId());
-        permissionDependencyRepository.save(dep);
-
-        log.info("Registered permission dependency: [{}] requires [{}]", perm.getCode(), reqPerm.getCode());
     }
 
     private PermissionResponse mapToResponse(Permission p) {

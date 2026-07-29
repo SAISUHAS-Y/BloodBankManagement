@@ -17,18 +17,15 @@ public class SecurityHierarchyConfig {
 
     @Bean
     public RoleHierarchy roleHierarchy() {
-        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
         try {
             String hierarchyString = roleService.buildSpringSecurityRoleHierarchyString();
-            if (!hierarchyString.isBlank()) {
-                roleHierarchy.setHierarchy(hierarchyString);
+            if (hierarchyString != null && !hierarchyString.isBlank()) {
                 log.info("Initialized Spring Security RoleHierarchy Engine with rules:\n{}", hierarchyString);
-            } else {
-                log.info("Initialized default flat RoleHierarchy Engine");
+                return RoleHierarchyImpl.fromHierarchy(hierarchyString);
             }
         } catch (Exception e) {
             log.warn("Could not load dynamic role hierarchy at startup (tables may be uninitialized): {}", e.getMessage());
         }
-        return roleHierarchy;
+        return RoleHierarchyImpl.fromHierarchy("");
     }
 }

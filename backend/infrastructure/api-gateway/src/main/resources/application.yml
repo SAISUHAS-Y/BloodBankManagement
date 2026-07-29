@@ -3,6 +3,8 @@ springdoc:
     enabled: true
   swagger-ui:
     enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha
     path: /swagger-ui.html
     urls:
       - name: 1. Identity Service (Auth & Security)

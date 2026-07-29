@@ -34,6 +34,12 @@ public class RefreshToken extends BaseEntity {
     @Column(name = "replaced_by_token", length = 255)
     private String replacedByToken;
 
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
+
+    @Column(name = "user_agent", length = 255)
+    private String userAgent;
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

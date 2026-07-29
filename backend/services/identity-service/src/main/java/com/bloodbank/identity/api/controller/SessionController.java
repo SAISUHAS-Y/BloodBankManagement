@@ -22,13 +22,13 @@ import java.util.List;
 @RequestMapping("/api/v1/sessions")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Session Governance", description = "Endpoints for inspecting and remotely terminating active device sessions")
+@Tag(name = "Active Device Sessions", description = "Simple endpoints for viewing logged-in devices and logging out specific or all other devices")
 public class SessionController {
 
     private final SessionService sessionService;
 
     @GetMapping
-    @Operation(summary = "Get All Active Sessions", description = "Lists all active sessions across all registered devices for the current authenticated user")
+    @Operation(summary = "View Active Logged-In Devices", description = "Get list of all devices currently logged into your account")
     public ResponseEntity<ApiResponse<List<SessionDetailsResponse>>> getUserSessions(Principal principal, HttpServletRequest request) {
         String currentSessionId = request.getHeader("X-Session-Id");
         List<SessionDetailsResponse> sessions = sessionService.getUserSessions(principal.getName(), currentSessionId);
@@ -36,7 +36,7 @@ public class SessionController {
     }
 
     @GetMapping("/me")
-    @Operation(summary = "Get Current Session Metadata", description = "Returns metadata for the currently active session processing this request")
+    @Operation(summary = "View Current Device Details", description = "Get details of the device you are currently using")
     public ResponseEntity<ApiResponse<SessionDetailsResponse>> getCurrentSession(Principal principal, HttpServletRequest request) {
         String currentSessionId = request.getHeader("X-Session-Id");
         SessionDetailsResponse session = sessionService.getCurrentSession(principal.getName(), currentSessionId);
@@ -44,14 +44,14 @@ public class SessionController {
     }
 
     @DeleteMapping("/{sessionId}")
-    @Operation(summary = "Terminate Target Session", description = "Remotely invalidates a specific target active session by session ID")
+    @Operation(summary = "Logout Target Device", description = "Log out a specific device by session ID")
     public ResponseEntity<ApiResponse<Void>> terminateSession(@PathVariable String sessionId, Principal principal) {
         sessionService.terminateSession(principal.getName(), sessionId);
         return ResponseEntity.ok(ApiResponse.success("Target session terminated successfully", null));
     }
 
     @DeleteMapping
-    @Operation(summary = "Logout Other Sessions", description = "Terminates all active sessions for the user EXCEPT the current processing session")
+    @Operation(summary = "Logout All Other Devices", description = "Log out all other devices except your current one")
     public ResponseEntity<ApiResponse<Void>> logoutOtherSessions(Principal principal, HttpServletRequest request) {
         String currentSessionId = request.getHeader("X-Session-Id");
         sessionService.terminateOtherSessions(principal.getName(), currentSessionId);

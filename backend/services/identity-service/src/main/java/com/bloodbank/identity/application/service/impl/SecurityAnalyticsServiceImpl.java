@@ -7,7 +7,6 @@ import com.bloodbank.identity.application.service.SecurityAnalyticsService;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import com.bloodbank.identity.domain.enums.AuthEventType;
 import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
-import com.bloodbank.identity.domain.repository.BlacklistedIpRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,7 +27,6 @@ import java.util.Map;
 public class SecurityAnalyticsServiceImpl implements SecurityAnalyticsService {
 
     private final AuthAuditLogRepository auditLogRepository;
-    private final BlacklistedIpRepository blacklistedIpRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -72,7 +70,6 @@ public class SecurityAnalyticsServiceImpl implements SecurityAnalyticsService {
         long failedLogins = logs.stream().filter(l -> l.getEventType() == AuthEventType.LOGIN_FAILED).count();
 
         double failedRate = totalEvents > 0 ? ((double) failedLogins / totalEvents) * 100.0 : 0.0;
-        long activeBlacklistedCount = blacklistedIpRepository.count();
 
         Map<String, Long> eventTypeDistribution = new HashMap<>();
         for (AuthAuditLog log : logs) {
@@ -96,7 +93,6 @@ public class SecurityAnalyticsServiceImpl implements SecurityAnalyticsService {
                 .successfulLogins(successfulLogins)
                 .failedLogins(failedLogins)
                 .failedLoginRatePercentage(Math.round(failedRate * 100.0) / 100.0)
-                .activeBlacklistedIps(activeBlacklistedCount)
                 .eventTypeDistribution(eventTypeDistribution)
                 .topFailedIps(topFailedIps)
                 .build();

@@ -23,16 +23,21 @@ import java.security.Principal;
 import com.bloodbank.identity.application.dto.MfaVerifyRequest;
 import com.bloodbank.identity.application.service.MfaService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Slf4j
+@Tag(name = "User Authentication & Login", description = "Simple endpoints for logging in, logging out, resetting passwords, and verifying emails")
 public class AuthController {
 
     private final AuthService authService;
     private final MfaService mfaService;
 
     @PostMapping("/login")
+    @Operation(summary = "Login to Account", description = "Enter username and password to log in")
     public ResponseEntity<ApiResponse<LoginResponse>> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpServletRequest) {
@@ -49,6 +54,7 @@ public class AuthController {
     }
 
     @PostMapping("/verify-mfa")
+    @Operation(summary = "Verify 2-Factor Authentication Code", description = "Enter 6-digit 2FA code or backup code to complete login")
     public ResponseEntity<ApiResponse<LoginResponse>> verifyMfa(
             @Valid @RequestBody MfaVerifyRequest request,
             HttpServletRequest httpServletRequest) {
@@ -65,6 +71,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
+    @Operation(summary = "Refresh Login Session", description = "Get a new login token when your current token expires")
     public ResponseEntity<ApiResponse<LoginResponse>> refresh(
             @Valid @RequestBody RefreshTokenRequest request,
             HttpServletRequest httpServletRequest) {
@@ -81,6 +88,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
+    @Operation(summary = "Logout Current Device", description = "Log out from current device session")
     public ResponseEntity<ApiResponse<Void>> logout(
             @Valid @RequestBody RefreshTokenRequest request) {
         
@@ -93,6 +101,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout-all")
+    @Operation(summary = "Logout From All Devices", description = "Log out from all devices at once")
     public ResponseEntity<ApiResponse<Void>> logoutAll(Principal principal) {
         if (principal == null) {
             return new ResponseEntity<>(
@@ -105,6 +114,7 @@ public class AuthController {
     }
 
     @PostMapping("/change-password")
+    @Operation(summary = "Change My Password", description = "Change your password (cannot reuse previous 5 passwords)")
     public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody ChangePasswordRequest request,
             Principal principal) {
@@ -125,18 +135,21 @@ public class AuthController {
     }
 
     @PostMapping("/forgot-password")
+    @Operation(summary = "Send Password Reset Email", description = "Request a password reset link to your email")
     public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody com.bloodbank.identity.application.dto.ForgotPasswordRequest request) {
         authService.forgotPassword(request);
         return ResponseEntity.ok(ApiResponse.success("If the email is registered, a password reset token has been dispatched", null));
     }
 
     @PostMapping("/reset-password")
+    @Operation(summary = "Reset Password Using Link", description = "Set a new password using the reset link token")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody com.bloodbank.identity.application.dto.ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.success("Password has been reset successfully", null));
     }
 
     @PostMapping("/verify-email")
+    @Operation(summary = "Verify Email Address", description = "Confirm and verify your email address")
     public ResponseEntity<ApiResponse<Void>> verifyEmail(@Valid @RequestBody com.bloodbank.identity.application.dto.VerifyEmailRequest request) {
         authService.verifyEmail(request);
         return ResponseEntity.ok(ApiResponse.success("Email address verified successfully", null));

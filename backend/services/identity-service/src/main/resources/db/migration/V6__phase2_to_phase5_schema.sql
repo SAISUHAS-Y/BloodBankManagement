@@ -1,0 +1,79 @@
+-- V6: Schema additions for User Sessions, Verification Tokens, User MFA Secrets, and Column Extensions
+
+-- 1. Alter Users Table
+ALTER TABLE users ADD COLUMN IF NOT EXISTS tenant_id VARCHAR(50) NULL;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(30) NOT NULL DEFAULT 'ACTIVE';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_email_verified BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS is_phone_verified BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- 2. Alter Roles Table
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS display_name VARCHAR(100) NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS category VARCHAR(50) NOT NULL DEFAULT 'GENERAL';
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS is_enabled BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS parent_role_id BIGINT NULL;
+ALTER TABLE roles ADD COLUMN IF NOT EXISTS version INT NOT NULL DEFAULT 1;
+
+-- 3. Alter Permissions Table
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS display_name VARCHAR(150) NULL;
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS category VARCHAR(50) NOT NULL DEFAULT 'GENERAL';
+ALTER TABLE permissions ADD COLUMN IF NOT EXISTS permission_group VARCHAR(50) NOT NULL DEFAULT 'DEFAULT';
+
+-- 4. Alter Refresh Tokens Table
+ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS ip_address VARCHAR(45) NULL;
+ALTER TABLE refresh_tokens ADD COLUMN IF NOT EXISTS user_agent VARCHAR(255) NULL;
+
+-- 5. User Sessions Table
+CREATE TABLE IF NOT EXISTS user_sessions (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    session_id VARCHAR(128) NOT NULL UNIQUE,
+    device_id VARCHAR(128) NULL,
+    device_name VARCHAR(128) NULL,
+    user_agent VARCHAR(512) NULL,
+    ip_address VARCHAR(45) NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    last_activity_at TIMESTAMP NULL,
+    expires_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(100) NULL,
+    updated_by VARCHAR(100) NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 0,
+    CONSTRAINT fk_session_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 6. Verification Tokens Table
+CREATE TABLE IF NOT EXISTS verification_tokens (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    token_hash VARCHAR(255) NOT NULL UNIQUE,
+    token_type VARCHAR(50) NOT NULL,
+    target_destination VARCHAR(255) NULL,
+    is_used BOOLEAN NOT NULL DEFAULT FALSE,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(100) NULL,
+    updated_by VARCHAR(100) NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 0,
+    CONSTRAINT fk_verification_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- 7. User MFA Secrets Table
+CREATE TABLE IF NOT EXISTS user_mfa_secrets (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL UNIQUE,
+    secret_key VARCHAR(128) NOT NULL,
+    is_mfa_enabled BOOLEAN NOT NULL DEFAULT FALSE,
+    mfa_type VARCHAR(20) NOT NULL DEFAULT 'TOTP',
+    scratch_codes TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by VARCHAR(100) NULL,
+    updated_by VARCHAR(100) NULL,
+    is_deleted BOOLEAN DEFAULT FALSE,
+    version INT DEFAULT 0,
+    CONSTRAINT fk_mfa_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

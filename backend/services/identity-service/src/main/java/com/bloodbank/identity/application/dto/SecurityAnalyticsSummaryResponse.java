@@ -30,9 +30,6 @@ public class SecurityAnalyticsSummaryResponse {
     @Schema(example = "3.88", description = "Failed login rate percentage")
     private double failedLoginRatePercentage;
 
-    @Schema(example = "45", description = "Total active blacklisted IP addresses")
-    private long activeBlacklistedIps;
-
     @Schema(description = "Distribution of security events grouped by event type")
     private Map<String, Long> eventTypeDistribution;
 

@@ -1,6 +1,5 @@
 package com.bloodbank.identity.application.service;
 
-import com.bloodbank.identity.application.dto.CloneRoleRequest;
 import com.bloodbank.identity.application.dto.CreateRoleRequest;
 import com.bloodbank.identity.application.dto.RoleHierarchyUpdateRequest;
 import com.bloodbank.identity.application.dto.RoleResponse;
@@ -17,10 +16,6 @@ public interface RoleService {
     RoleResponse getRoleByCode(String code);
 
     List<RoleResponse> getAllRoles();
-
-    RoleResponse cloneRole(Long sourceRoleId, CloneRoleRequest request);
-
-    void copyPermissions(Long sourceRoleId, Long targetRoleId);
 
     void setRoleEnabled(Long roleId, boolean enabled);
 

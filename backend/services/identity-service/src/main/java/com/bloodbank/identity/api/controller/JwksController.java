@@ -17,13 +17,13 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "JWKS Key Discovery", description = "RFC 7517 JSON Web Key Set discovery endpoints for JWT signature verification")
+@Tag(name = "Security Keys (JWKS)", description = "Public security key endpoint used by system components to verify login tokens")
 public class JwksController {
 
     private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping(value = {"/.well-known/jwks.json", "/api/v1/jwks.json"}, produces = "application/json")
-    @Operation(summary = "Get JSON Web Key Set (JWKS)", description = "Exposes public RSA signing key parameters for stateless token signature verification across gateway and microservices.")
+    @Operation(summary = "Get Public Security Keys", description = "Returns public keys for validating JWT authentication tokens")
     public ResponseEntity<Map<String, Object>> getJwks() {
         RSAPublicKey publicKey = jwtTokenProvider.getRSAPublicKey();
         if (publicKey == null) {

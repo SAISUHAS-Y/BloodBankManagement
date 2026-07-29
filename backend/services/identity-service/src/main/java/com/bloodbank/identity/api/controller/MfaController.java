@@ -23,20 +23,20 @@ import java.security.Principal;
 @RequestMapping("/api/v1/mfa")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Multi-Factor Authentication", description = "Endpoints for configuring TOTP 2FA, backup recovery codes, and MFA verification")
+@Tag(name = "Two-Factor Authentication (2FA)", description = "Simple endpoints for turning on 2FA (Authenticator App), getting backup codes, and turning off 2FA")
 public class MfaController {
 
     private final MfaService mfaService;
 
     @PostMapping("/setup")
-    @Operation(summary = "Initiate MFA Setup", description = "Generates TOTP secret key and QR code URI for scanning with authenticator app")
+    @Operation(summary = "Start 2FA Setup (Get QR Code)", description = "Get QR code link to scan with Google Authenticator or Authy app")
     public ResponseEntity<ApiResponse<MfaSetupResponse>> setupMfa(Principal principal) {
         MfaSetupResponse response = mfaService.setupMfa(principal.getName());
         return ResponseEntity.ok(ApiResponse.success("MFA setup initiated. Scan QR code to continue.", response));
     }
 
     @PostMapping("/enable")
-    @Operation(summary = "Confirm & Enable MFA", description = "Verifies TOTP token, activates MFA on account, and returns 8 single-use backup codes")
+    @Operation(summary = "Enable 2FA (Get Backup Codes)", description = "Confirm 6-digit code from app to activate 2FA and receive emergency backup codes")
     public ResponseEntity<ApiResponse<MfaBackupCodesResponse>> enableMfa(
             @Valid @RequestBody MfaEnableRequest request,
             Principal principal) {
@@ -45,7 +45,7 @@ public class MfaController {
     }
 
     @PostMapping("/disable")
-    @Operation(summary = "Disable MFA", description = "Confirms password and TOTP token to deactivate 2FA on account")
+    @Operation(summary = "Disable 2FA", description = "Turn off 2FA on your account")
     public ResponseEntity<ApiResponse<Void>> disableMfa(
             @Valid @RequestBody MfaDisableRequest request,
             Principal principal) {
@@ -54,7 +54,7 @@ public class MfaController {
     }
 
     @PostMapping("/generate-backup-codes")
-    @Operation(summary = "Regenerate Backup Recovery Codes", description = "Replaces existing backup codes with 8 fresh single-use emergency recovery codes")
+    @Operation(summary = "Generate New Backup Codes", description = "Generate 8 new emergency recovery backup codes")
     public ResponseEntity<ApiResponse<MfaBackupCodesResponse>> generateBackupCodes(Principal principal) {
         MfaBackupCodesResponse response = mfaService.generateBackupCodes(principal.getName());
         return ResponseEntity.ok(ApiResponse.success("Fresh backup codes generated successfully", response));

@@ -3,7 +3,6 @@ package com.bloodbank.identity.application.service.impl;
 import com.bloodbank.common.exception.BusinessRuleViolationException;
 import com.bloodbank.common.exception.DuplicateResourceException;
 import com.bloodbank.common.exception.ResourceNotFoundException;
-import com.bloodbank.identity.application.dto.CloneRoleRequest;
 import com.bloodbank.identity.application.dto.CreateRoleRequest;
 import com.bloodbank.identity.application.dto.RoleHierarchyUpdateRequest;
 import com.bloodbank.identity.application.dto.RoleResponse;
@@ -103,70 +102,6 @@ public class RoleServiceImpl implements RoleService {
             Set<Long> permIds = getRolePermissionIds(role.getId());
             return mapToResponse(role, permIds);
         }).toList();
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = "user_summary", allEntries = true)
-    public RoleResponse cloneRole(Long sourceRoleId, CloneRoleRequest request) {
-        Role sourceRole = roleRepository.findById(sourceRoleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Source role not found with ID: " + sourceRoleId));
-
-        if (roleRepository.findByName(request.getTargetRoleCode()).isPresent()) {
-            throw new DuplicateResourceException("Target role code already exists: " + request.getTargetRoleCode());
-        }
-
-        Role newRole = new Role();
-        newRole.setName(request.getTargetRoleCode());
-        newRole.setDisplayName(request.getTargetDisplayName());
-        newRole.setDescription(request.getTargetDescription() != null ? request.getTargetDescription() : sourceRole.getDescription());
-        newRole.setCategory(sourceRole.getCategory());
-        newRole.setSystemRole(false);
-        newRole.setEnabled(true);
-        newRole.setParentRole(sourceRole.getParentRole());
-
-        Role savedRole = roleRepository.save(newRole);
-
-        List<RolePermission> sourceRPs = rolePermissionRepository.findByRoleId(sourceRoleId);
-        List<RolePermission> newRPs = sourceRPs.stream().map(srp -> {
-            RolePermission rp = new RolePermission();
-            rp.setRole(savedRole);
-            rp.setPermission(srp.getPermission());
-            return rp;
-        }).toList();
-        rolePermissionRepository.saveAll(newRPs);
-
-        Set<Long> permIds = newRPs.stream().map(rp -> rp.getPermission().getId()).collect(Collectors.toSet());
-        log.info("Cloned role [{}] into new target role [{}]", sourceRole.getName(), savedRole.getName());
-        return mapToResponse(savedRole, permIds);
-    }
-
-    @Override
-    @Transactional
-    @CacheEvict(value = "user_summary", allEntries = true)
-    public void copyPermissions(Long sourceRoleId, Long targetRoleId) {
-        Role sourceRole = roleRepository.findById(sourceRoleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Source role not found with ID: " + sourceRoleId));
-
-        Role targetRole = roleRepository.findById(targetRoleId)
-                .orElseThrow(() -> new ResourceNotFoundException("Target role not found with ID: " + targetRoleId));
-
-        List<RolePermission> sourceRPs = rolePermissionRepository.findByRoleId(sourceRoleId);
-        Set<Long> existingTargetPermIds = rolePermissionRepository.findByRoleId(targetRoleId).stream()
-                .map(rp -> rp.getPermission().getId())
-                .collect(Collectors.toSet());
-
-        List<RolePermission> toAdd = sourceRPs.stream()
-                .filter(srp -> !existingTargetPermIds.contains(srp.getPermission().getId()))
-                .map(srp -> {
-                    RolePermission rp = new RolePermission();
-                    rp.setRole(targetRole);
-                    rp.setPermission(srp.getPermission());
-                    return rp;
-                }).toList();
-
-        rolePermissionRepository.saveAll(toAdd);
-        log.info("Copied [{}] new permissions from role [{}] to role [{}]", toAdd.size(), sourceRole.getName(), targetRole.getName());
     }
 
     @Override

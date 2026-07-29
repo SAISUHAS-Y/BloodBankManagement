@@ -24,14 +24,14 @@ import java.util.Map;
 @RequestMapping("/api/v1/admin/permissions")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Permission System", description = "Endpoints for inspecting system permissions, modules, and the Role-Permission Matrix grid")
+@Tag(name = "Permissions Management", description = "Simple endpoints for viewing permissions, modules, and the role-permission matrix grid")
 public class PermissionController {
 
     private final PermissionService permissionService;
 
     @GetMapping("/matrix")
     @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Get Role-Permission Matrix Grid", description = "Fetches the complete matrix grid mapping all roles to module-grouped permissions")
+    @Operation(summary = "View Role-Permission Matrix", description = "View the complete grid mapping roles to permissions")
     public ResponseEntity<ApiResponse<PermissionMatrixResponse>> getPermissionMatrix() {
         PermissionMatrixResponse matrix = permissionService.getPermissionMatrix();
         return ResponseEntity.ok(ApiResponse.success("Permission matrix fetched successfully", matrix));
@@ -39,7 +39,7 @@ public class PermissionController {
 
     @GetMapping
     @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Get All System Permissions", description = "Returns all registered system permissions")
+    @Operation(summary = "View All Permissions", description = "View all permissions in the system")
     public ResponseEntity<ApiResponse<List<PermissionResponse>>> getAllPermissions() {
         List<PermissionResponse> permissions = permissionService.getAllPermissions();
         return ResponseEntity.ok(ApiResponse.success(permissions));
@@ -47,7 +47,7 @@ public class PermissionController {
 
     @GetMapping("/modules")
     @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Get System Modules", description = "Returns list of all distinct system modules")
+    @Operation(summary = "View System Modules", description = "View list of all modules (e.g. Donor, Hospital, Blood Bank)")
     public ResponseEntity<ApiResponse<List<String>>> getAllModules() {
         List<String> modules = permissionService.getAllModules();
         return ResponseEntity.ok(ApiResponse.success(modules));
@@ -55,7 +55,7 @@ public class PermissionController {
 
     @GetMapping("/categories")
     @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Get Permission Categories", description = "Returns list of all permission categories")
+    @Operation(summary = "View Permission Categories", description = "View permission category groupings")
     public ResponseEntity<ApiResponse<List<String>>> getAllCategories() {
         List<String> categories = permissionService.getAllCategories();
         return ResponseEntity.ok(ApiResponse.success(categories));
@@ -63,19 +63,11 @@ public class PermissionController {
 
     @GetMapping("/grouped-by-module")
     @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Get Permissions Grouped by Module", description = "Returns system permissions categorized by module")
+    @Operation(summary = "View Permissions Grouped by Module", description = "View permissions organized under their respective modules")
     public ResponseEntity<ApiResponse<Map<String, List<PermissionResponse>>>> getPermissionsGroupedByModule() {
         Map<String, List<PermissionResponse>> grouped = permissionService.getPermissionsGroupedByModule();
         return ResponseEntity.ok(ApiResponse.success(grouped));
     }
 
-    @PostMapping("/{permissionId}/dependencies/{dependsOnPermissionId}")
-    @HasPermission("PERMISSION_MANAGE")
-    @Operation(summary = "Add Permission Prerequisite Dependency", description = "Registers a requirement that permissionId requires dependsOnPermissionId")
-    public ResponseEntity<ApiResponse<Void>> addPermissionDependency(
-            @PathVariable Long permissionId,
-            @PathVariable Long dependsOnPermissionId) {
-        permissionService.addPermissionDependency(permissionId, dependsOnPermissionId);
-        return ResponseEntity.ok(ApiResponse.success("Permission dependency registered successfully", null));
-    }
+
 }

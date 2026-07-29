@@ -173,7 +173,8 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(rawRefreshToken)
-                .expiresIn(accessExpirationMs / 1000)
+                .tokenType("Bearer")
+                .expiresInMs(accessExpirationMs)
                 .user(userSummary)
                 .build();
     }
@@ -248,7 +249,8 @@ public class AuthServiceImpl implements AuthService {
         return LoginResponse.builder()
                 .accessToken(newAccessToken)
                 .refreshToken(newRawToken)
-                .expiresIn(accessExpirationMs / 1000)
+                .tokenType("Bearer")
+                .expiresInMs(accessExpirationMs)
                 .user(userSummary)
                 .build();
     }

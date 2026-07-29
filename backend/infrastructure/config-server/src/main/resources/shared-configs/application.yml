@@ -84,3 +84,5 @@ springdoc:
     path: /v3/api-docs
   swagger-ui:
     enabled: true
+    tags-sorter: alpha
+    operations-sorter: alpha

@@ -211,7 +211,7 @@ public class MfaServiceImpl implements MfaService {
         Set<String> roles = getUserRoleNames(user);
         Set<String> permissions = getUserPermissionCodes(user);
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getUsername(), roles, permissions);
+        String accessToken = jwtTokenProvider.generateToken(user.getUsername(), user.getId(), roles, permissions);
         String refreshTokenStr = UUID.randomUUID().toString();
 
         RefreshToken refreshToken = new RefreshToken();
