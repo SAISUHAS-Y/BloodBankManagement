@@ -1,6 +1,7 @@
 package com.bloodbank.user.application.event;
 
 import com.bloodbank.common.events.EventEnvelope;
+import com.bloodbank.common.events.user.UserRegisteredEvent;
 import com.bloodbank.user.domain.entity.DonorProfile;
 import com.bloodbank.user.domain.entity.StaffProfile;
 import com.bloodbank.user.domain.enums.DonorStatus;
@@ -16,7 +17,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Component
@@ -35,16 +35,16 @@ public class UserLifecycleEventListener {
         )
     )
     @Transactional
-    public void handleUserDeactivated(EventEnvelope<Map<String, Object>> envelope) {
-        Map<String, Object> payload = envelope.getPayload();
+    public void handleUserDeactivated(EventEnvelope<UserRegisteredEvent> envelope) {
+        UserRegisteredEvent payload = envelope.getPayload();
         log.info("Received identity user deactivation event: payload={}", payload);
 
-        if (payload == null || !payload.containsKey("userId")) {
+        if (payload == null || payload.getUserId() == null) {
             log.warn("Invalid payload received for identity user deactivation");
             return;
         }
 
-        Long identityUserId = Long.valueOf(payload.get("userId").toString());
+        Long identityUserId = payload.getUserId();
 
         // Sync linked donor profile
         Optional<DonorProfile> donorOpt = donorProfileRepository.findByIdentityUserId(identityUserId);

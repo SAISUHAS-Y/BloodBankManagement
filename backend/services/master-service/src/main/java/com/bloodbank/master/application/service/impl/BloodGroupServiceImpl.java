@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,11 +23,17 @@ public class BloodGroupServiceImpl implements BloodGroupService {
     private final BloodGroupRepository bloodGroupRepository;
 
     @Override
-    @Transactional(readOnly = true)
-    @Cacheable(value = "blood_groups")
+    @Transactional
     public List<BloodGroupResponse> getAllBloodGroups() {
         log.info("Fetching blood groups from database");
-        return bloodGroupRepository.findAll().stream()
+        List<BloodGroup> list = bloodGroupRepository.findAll();
+
+        if (list.isEmpty()) {
+            log.info("No blood groups found in database. Initializing default master records...");
+            list = seedDefaultBloodGroups();
+        }
+
+        return list.stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
@@ -39,6 +46,35 @@ public class BloodGroupServiceImpl implements BloodGroupService {
         BloodGroup bg = bloodGroupRepository.findByCode(code)
                 .orElseThrow(() -> new ResourceNotFoundException("Blood group not found with code: " + code));
         return mapToResponse(bg);
+    }
+
+    private List<BloodGroup> seedDefaultBloodGroups() {
+        List<BloodGroup> defaults = List.of(
+            createBloodGroup("UNKNOWN", "Unknown", false, false),
+            createBloodGroup("O_POSITIVE", "O+", false, false),
+            createBloodGroup("O_NEGATIVE", "O-", true, false),
+            createBloodGroup("A_POSITIVE", "A+", false, false),
+            createBloodGroup("A_NEGATIVE", "A-", false, false),
+            createBloodGroup("B_POSITIVE", "B+", false, false),
+            createBloodGroup("B_NEGATIVE", "B-", false, false),
+            createBloodGroup("AB_POSITIVE", "AB+", false, true),
+            createBloodGroup("AB_NEGATIVE", "AB-", false, false)
+        );
+
+        List<BloodGroup> savedList = new ArrayList<>();
+        for (BloodGroup bg : defaults) {
+            savedList.add(bloodGroupRepository.save(bg));
+        }
+        return savedList;
+    }
+
+    private BloodGroup createBloodGroup(String code, String displayName, boolean universalDonor, boolean universalRecipient) {
+        BloodGroup bg = new BloodGroup();
+        bg.setCode(code);
+        bg.setDisplayName(displayName);
+        bg.setUniversalDonor(universalDonor);
+        bg.setUniversalRecipient(universalRecipient);
+        return bg;
     }
 
     private BloodGroupResponse mapToResponse(BloodGroup bg) {

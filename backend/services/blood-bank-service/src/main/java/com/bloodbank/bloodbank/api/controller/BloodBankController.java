@@ -2,8 +2,8 @@ package com.bloodbank.bloodbank.api.controller;
 
 import com.bloodbank.common.core.dto.ApiResponse;
 import com.bloodbank.common.security.annotation.HasPermission;
-import com.bloodbank.bloodbank.application.dto.BloodBankRequest;
-import com.bloodbank.bloodbank.application.dto.BloodBankResponse;
+import com.bloodbank.bloodbank.application.dto.request.BloodBankRequest;
+import com.bloodbank.bloodbank.application.dto.response.BloodBankResponse;
 import com.bloodbank.bloodbank.application.service.BloodBankService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

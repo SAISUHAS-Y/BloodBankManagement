@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  * Default behavior:
  * - Disables CSRF (stateless JWT architecture)
  * - Stateless session management
- * - Permits: Swagger UI, OpenAPI docs, Actuator endpoints, and webjars
+ * - Permits: Swagger UI, OpenAPI docs, Actuator, Master lookup endpoints (/api/v1/master/**)
  * - Requires authentication for all other paths
  * - Adds the shared JWT authentication filter
  */
@@ -52,6 +52,8 @@ public class DefaultSecurityConfig {
                 ).permitAll()
                 // Spring Boot Actuator health and info endpoints
                 .requestMatchers("/actuator/**").permitAll()
+                // Public master lookup endpoints (e.g., blood groups, locations, categories)
+                .requestMatchers("/api/v1/master/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
