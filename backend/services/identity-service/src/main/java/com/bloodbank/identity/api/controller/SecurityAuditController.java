@@ -3,8 +3,8 @@ package com.bloodbank.identity.api.controller;
 import com.bloodbank.common.core.dto.ApiResponse;
 import com.bloodbank.common.core.dto.PageResponse;
 import com.bloodbank.common.security.annotation.HasPermission;
-import com.bloodbank.identity.application.dto.AuthAuditLogQueryRequest;
-import com.bloodbank.identity.application.dto.SecurityAnalyticsSummaryResponse;
+import com.bloodbank.identity.application.dto.request.AuthAuditLogQueryRequest;
+import com.bloodbank.identity.application.dto.response.SecurityAnalyticsSummaryResponse;
 import com.bloodbank.identity.application.service.SecurityAnalyticsService;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,8 +17,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/security")

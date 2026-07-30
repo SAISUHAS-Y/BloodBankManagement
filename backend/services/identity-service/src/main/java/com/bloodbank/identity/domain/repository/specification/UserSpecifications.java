@@ -1,6 +1,6 @@
 package com.bloodbank.identity.domain.repository.specification;
 
-import com.bloodbank.identity.application.dto.UserSearchRequest;
+import com.bloodbank.identity.application.dto.request.UserSearchRequest;
 import com.bloodbank.identity.domain.entity.User;
 import com.bloodbank.identity.domain.enums.UserStatus;
 import jakarta.persistence.criteria.Predicate;

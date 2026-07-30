@@ -1,6 +1,6 @@
 package com.bloodbank.identity.application.service;
 
-import com.bloodbank.identity.application.dto.SessionDetailsResponse;
+import com.bloodbank.identity.application.dto.response.SessionDetailsResponse;
 
 import java.util.List;
 

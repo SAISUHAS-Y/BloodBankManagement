@@ -1,7 +1,7 @@
 package com.bloodbank.identity.application.service;
 
-import com.bloodbank.identity.application.dto.PermissionMatrixResponse;
-import com.bloodbank.identity.application.dto.PermissionResponse;
+import com.bloodbank.identity.application.dto.response.PermissionMatrixResponse;
+import com.bloodbank.identity.application.dto.response.PermissionResponse;
 
 import java.util.List;
 import java.util.Map;

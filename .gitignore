@@ -17,6 +17,12 @@ target/
 .project
 
 # =========================
+# AI Frameworks & Local AI Config
+# =========================
+.ecc/
+ECC/
+
+# =========================
 # OS Generated Files
 # =========================
 .DS_Store
@@ -34,6 +40,8 @@ logs/
 # Environment & Credentials
 # =========================
 *.env
+.env.*
+!.env.example
 
 # =========================
 # Documentation (Local Only)
@@ -41,3 +49,18 @@ logs/
 .agents/
 business_requirements.md
 technical_architecture.md
+
+# =========================
+# Misc
+# =========================
+*.bak
+*.swp
+
+# AI context files — local dev reference only, not tracked
+PRD.md
+ARCHITECTURE.md
+AGENTS.md
+TASKS.md
+DECISIONS.md
+DOMAIN_MODELS.md
+env.example

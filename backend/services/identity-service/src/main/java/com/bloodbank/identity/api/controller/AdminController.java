@@ -1,14 +1,14 @@
 package com.bloodbank.identity.api.controller;
 
-import com.bloodbank.common.core.dto.ApiResponse;
 import com.bloodbank.common.contracts.dto.UserSummaryResponse;
+import com.bloodbank.common.core.dto.ApiResponse;
 import com.bloodbank.common.security.annotation.HasPermission;
-import com.bloodbank.identity.application.dto.AssignRoleRequest;
-import com.bloodbank.identity.application.dto.PermissionResponse;
-import com.bloodbank.identity.application.dto.RegisterUserRequest;
-import com.bloodbank.identity.application.dto.RoleRequest;
-import com.bloodbank.identity.application.dto.RoleResponse;
+import com.bloodbank.identity.application.dto.request.AssignRoleRequest;
+import com.bloodbank.identity.application.dto.request.RegisterUserRequest;
+import com.bloodbank.identity.application.dto.request.UserSearchRequest;
 import com.bloodbank.identity.application.service.AdminService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +24,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -62,7 +59,7 @@ public class AdminController {
     @HasPermission("USER_MANAGE")
     @Operation(summary = "Search Users with Multi-Field Filters", description = "Executes paginated JPA Specification search with status, tenant, date range, and free-text filters")
     public ResponseEntity<ApiResponse<com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse>>> searchUsers(
-            @Valid @RequestBody com.bloodbank.identity.application.dto.UserSearchRequest request) {
+            @Valid @RequestBody UserSearchRequest request) {
         
         com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse> response = adminService.searchUsers(request);
         return ResponseEntity.ok(ApiResponse.success("Users search executed successfully", response));

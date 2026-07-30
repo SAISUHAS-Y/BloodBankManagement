@@ -1,14 +1,8 @@
 package com.bloodbank.identity.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RefreshTokenRequest {
-    @NotBlank(message = "Refresh token is required")
-    private String refreshToken;
+/**
+ * @deprecated Use {@link com.bloodbank.identity.application.dto.request.RefreshTokenRequest} instead.
+ */
+@Deprecated
+public class RefreshTokenRequest extends com.bloodbank.identity.application.dto.request.RefreshTokenRequest {
 }

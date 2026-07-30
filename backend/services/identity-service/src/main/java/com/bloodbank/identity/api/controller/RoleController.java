@@ -2,9 +2,9 @@ package com.bloodbank.identity.api.controller;
 
 import com.bloodbank.common.core.dto.ApiResponse;
 import com.bloodbank.common.security.annotation.HasPermission;
-import com.bloodbank.identity.application.dto.CreateRoleRequest;
-import com.bloodbank.identity.application.dto.RoleHierarchyUpdateRequest;
-import com.bloodbank.identity.application.dto.RoleResponse;
+import com.bloodbank.identity.application.dto.request.CreateRoleRequest;
+import com.bloodbank.identity.application.dto.request.RoleHierarchyUpdateRequest;
+import com.bloodbank.identity.application.dto.response.RoleResponse;
 import com.bloodbank.identity.application.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;

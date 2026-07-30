@@ -1,8 +1,8 @@
 package com.bloodbank.identity.application.service.impl;
 
 import com.bloodbank.common.core.dto.PageResponse;
-import com.bloodbank.identity.application.dto.AuthAuditLogQueryRequest;
-import com.bloodbank.identity.application.dto.SecurityAnalyticsSummaryResponse;
+import com.bloodbank.identity.application.dto.request.AuthAuditLogQueryRequest;
+import com.bloodbank.identity.application.dto.response.SecurityAnalyticsSummaryResponse;
 import com.bloodbank.identity.application.service.SecurityAnalyticsService;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import com.bloodbank.identity.domain.enums.AuthEventType;

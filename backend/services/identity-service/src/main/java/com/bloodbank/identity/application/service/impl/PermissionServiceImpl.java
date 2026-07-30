@@ -1,7 +1,7 @@
 package com.bloodbank.identity.application.service.impl;
 
-import com.bloodbank.identity.application.dto.PermissionMatrixResponse;
-import com.bloodbank.identity.application.dto.PermissionResponse;
+import com.bloodbank.identity.application.dto.response.PermissionMatrixResponse;
+import com.bloodbank.identity.application.dto.response.PermissionResponse;
 import com.bloodbank.identity.application.service.PermissionService;
 import com.bloodbank.identity.domain.entity.Permission;
 import com.bloodbank.identity.domain.entity.Role;

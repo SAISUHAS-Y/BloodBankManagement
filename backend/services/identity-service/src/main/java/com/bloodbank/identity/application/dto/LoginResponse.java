@@ -1,21 +1,8 @@
 package com.bloodbank.identity.application.dto;
 
-import com.bloodbank.common.contracts.dto.UserSummaryResponse;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginResponse {
-    private String accessToken;
-    private String refreshToken;
-    private String tokenType;
-    private long expiresInMs;
-    private boolean mfaRequired;
-    private String mfaToken;
-    private UserSummaryResponse user;
+/**
+ * @deprecated Use {@link com.bloodbank.identity.application.dto.response.LoginResponse} instead.
+ */
+@Deprecated
+public class LoginResponse extends com.bloodbank.identity.application.dto.response.LoginResponse {
 }

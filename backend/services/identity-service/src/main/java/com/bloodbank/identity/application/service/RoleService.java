@@ -1,8 +1,8 @@
 package com.bloodbank.identity.application.service;
 
-import com.bloodbank.identity.application.dto.CreateRoleRequest;
-import com.bloodbank.identity.application.dto.RoleHierarchyUpdateRequest;
-import com.bloodbank.identity.application.dto.RoleResponse;
+import com.bloodbank.identity.application.dto.request.CreateRoleRequest;
+import com.bloodbank.identity.application.dto.request.RoleHierarchyUpdateRequest;
+import com.bloodbank.identity.application.dto.response.RoleResponse;
 
 import java.util.List;
 import java.util.Map;

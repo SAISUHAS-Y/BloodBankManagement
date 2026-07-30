@@ -11,9 +11,15 @@ import org.springframework.context.annotation.Import;
 public class RabbitConfig {
 
     public static final String DONOR_EXCHANGE = "bloodbank.donor.exchange";
+    public static final String STAFF_EXCHANGE = "bloodbank.staff.exchange";
 
     @Bean
     public TopicExchange donorExchange() {
         return new TopicExchange(DONOR_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public TopicExchange staffExchange() {
+        return new TopicExchange(STAFF_EXCHANGE, true, false);
     }
 }

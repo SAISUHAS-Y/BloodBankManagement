@@ -1,7 +1,7 @@
 package com.bloodbank.bloodbank.application.service;
 
-import com.bloodbank.bloodbank.application.dto.BloodBankRequest;
-import com.bloodbank.bloodbank.application.dto.BloodBankResponse;
+import com.bloodbank.bloodbank.application.dto.request.BloodBankRequest;
+import com.bloodbank.bloodbank.application.dto.response.BloodBankResponse;
 import org.springframework.data.domain.Page;
 
 public interface BloodBankService {

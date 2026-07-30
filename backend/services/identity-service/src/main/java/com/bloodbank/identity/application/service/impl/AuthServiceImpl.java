@@ -7,14 +7,15 @@ import com.bloodbank.common.exception.ResourceNotFoundException;
 import com.bloodbank.common.exception.UnauthorizedActionException;
 import com.bloodbank.common.security.audit.SecurityAuditLogger;
 import com.bloodbank.common.security.jwt.JwtTokenProvider;
-import com.bloodbank.identity.application.dto.ChangePasswordRequest;
-import com.bloodbank.identity.application.dto.LoginRequest;
-import com.bloodbank.identity.application.dto.LoginResponse;
-import com.bloodbank.identity.application.dto.RefreshTokenRequest;
+import com.bloodbank.identity.application.dto.request.ChangePasswordRequest;
+import com.bloodbank.identity.application.dto.request.ForgotPasswordRequest;
+import com.bloodbank.identity.application.dto.request.LoginRequest;
+import com.bloodbank.identity.application.dto.request.RefreshTokenRequest;
+import com.bloodbank.identity.application.dto.request.ResetPasswordRequest;
+import com.bloodbank.identity.application.dto.request.VerifyEmailRequest;
+import com.bloodbank.identity.application.dto.response.LoginResponse;
 import com.bloodbank.identity.application.service.AuthService;
-import com.bloodbank.identity.application.dto.ForgotPasswordRequest;
-import com.bloodbank.identity.application.dto.ResetPasswordRequest;
-import com.bloodbank.identity.application.dto.VerifyEmailRequest;
+import com.bloodbank.identity.application.service.MfaService;
 import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import com.bloodbank.identity.domain.entity.PasswordHistory;
 import com.bloodbank.identity.domain.entity.RefreshToken;
@@ -24,8 +25,9 @@ import com.bloodbank.identity.domain.entity.VerificationToken;
 import com.bloodbank.identity.domain.enums.AuthEventType;
 import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
 import com.bloodbank.identity.domain.repository.PasswordHistoryRepository;
-import com.bloodbank.identity.domain.repository.RolePermissionRepository;
 import com.bloodbank.identity.domain.repository.RefreshTokenRepository;
+import com.bloodbank.identity.domain.repository.RolePermissionRepository;
+import com.bloodbank.identity.domain.repository.UserMfaSecretRepository;
 import com.bloodbank.identity.domain.repository.UserRepository;
 import com.bloodbank.identity.domain.repository.UserRoleRepository;
 import com.bloodbank.identity.domain.repository.VerificationTokenRepository;
@@ -44,9 +46,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.bloodbank.identity.domain.repository.UserMfaSecretRepository;
-import com.bloodbank.identity.application.service.MfaService;
 
 @Service
 @RequiredArgsConstructor
@@ -188,11 +187,6 @@ public class AuthServiceImpl implements AuthService {
         RefreshToken existingToken = refreshTokenRepository.findByTokenHash(tokenHash)
                 .orElseThrow(() -> new InvalidInputException("Invalid refresh token"));
 
-        // REUSE DETECTION EVENT (CRITICAL SECURITY PROPERTY):
-        // If an already-revoked refresh token is presented again, this indicates token
-        // theft!
-        // Immediately revoke ALL active refresh tokens for that user and log a security
-        // denial alert.
         if (existingToken.isRevoked()) {
             List<RefreshToken> activeTokens = refreshTokenRepository
                     .findByUserIdAndRevokedFalse(existingToken.getUserId());
@@ -219,7 +213,6 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidInputException("Expired refresh token. Please log in again.");
         }
 
-        // Revoke the presented token and issue a NEW rotated refresh token
         existingToken.setRevoked(true);
         existingToken.setRevokedAt(Instant.now());
 
@@ -297,13 +290,11 @@ public class AuthServiceImpl implements AuthService {
             throw new InvalidInputException("Current password does not match");
         }
 
-        // Password complexity enforcement
         String newPassword = request.getNewPassword();
         if (newPassword == null || newPassword.length() < 8) {
             throw new InvalidInputException("New password must be at least 8 characters long");
         }
 
-        // Historical password retention check (NIST 800-63B standard: prevent reuse of last 5 passwords)
         List<PasswordHistory> pastPasswords = passwordHistoryRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
         List<PasswordHistory> recentPasswords = pastPasswords.stream().limit(5).toList();
         for (PasswordHistory history : recentPasswords) {
@@ -320,7 +311,6 @@ public class AuthServiceImpl implements AuthService {
         user.setMustChangePassword(false);
         userRepository.save(user);
 
-        // Record into Password History ledger
         PasswordHistory historyRecord = new PasswordHistory();
         historyRecord.setUserId(user.getId());
         historyRecord.setPasswordHash(newPasswordHash);

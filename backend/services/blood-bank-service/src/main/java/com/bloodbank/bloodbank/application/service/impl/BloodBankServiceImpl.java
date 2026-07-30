@@ -1,16 +1,16 @@
 package com.bloodbank.bloodbank.application.service.impl;
 
-import com.bloodbank.common.exception.InvalidInputException;
-import com.bloodbank.common.exception.ResourceNotFoundException;
-import com.bloodbank.common.contracts.client.MasterServiceClient;
-import com.bloodbank.common.contracts.dto.BloodGroupContractResponse;
-import com.bloodbank.bloodbank.application.dto.BloodBankRequest;
-import com.bloodbank.bloodbank.application.dto.BloodBankResponse;
+import com.bloodbank.bloodbank.application.dto.request.BloodBankRequest;
+import com.bloodbank.bloodbank.application.dto.response.BloodBankResponse;
 import com.bloodbank.bloodbank.application.service.BloodBankService;
 import com.bloodbank.bloodbank.domain.entity.BloodBank;
 import com.bloodbank.bloodbank.domain.entity.BloodStock;
 import com.bloodbank.bloodbank.domain.repository.BloodBankRepository;
 import com.bloodbank.bloodbank.domain.repository.BloodStockRepository;
+import com.bloodbank.common.contracts.client.MasterServiceClient;
+import com.bloodbank.common.contracts.dto.BloodGroupContractResponse;
+import com.bloodbank.common.exception.InvalidInputException;
+import com.bloodbank.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;

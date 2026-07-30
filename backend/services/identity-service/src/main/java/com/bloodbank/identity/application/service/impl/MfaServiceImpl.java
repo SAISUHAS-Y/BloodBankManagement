@@ -5,12 +5,12 @@ import com.bloodbank.common.exception.InvalidInputException;
 import com.bloodbank.common.exception.ResourceNotFoundException;
 import com.bloodbank.common.exception.UnauthorizedActionException;
 import com.bloodbank.common.security.jwt.JwtTokenProvider;
-import com.bloodbank.identity.application.dto.LoginResponse;
-import com.bloodbank.identity.application.dto.MfaBackupCodesResponse;
-import com.bloodbank.identity.application.dto.MfaDisableRequest;
-import com.bloodbank.identity.application.dto.MfaEnableRequest;
-import com.bloodbank.identity.application.dto.MfaSetupResponse;
-import com.bloodbank.identity.application.dto.MfaVerifyRequest;
+import com.bloodbank.identity.application.dto.request.MfaDisableRequest;
+import com.bloodbank.identity.application.dto.request.MfaEnableRequest;
+import com.bloodbank.identity.application.dto.request.MfaVerifyRequest;
+import com.bloodbank.identity.application.dto.response.LoginResponse;
+import com.bloodbank.identity.application.dto.response.MfaBackupCodesResponse;
+import com.bloodbank.identity.application.dto.response.MfaSetupResponse;
 import com.bloodbank.identity.application.service.MfaService;
 import com.bloodbank.identity.application.service.TotpService;
 import com.bloodbank.identity.domain.entity.RefreshToken;
@@ -69,7 +69,6 @@ public class MfaServiceImpl implements MfaService {
     @Value("${app.name:BloodBankManagement}")
     private String appName;
 
-    // Temporary store for MFA challenge tokens (mfaToken -> ChallengeData)
     private final Map<String, ChallengeData> challengeMap = new ConcurrentHashMap<>();
 
     private record ChallengeData(Long userId, String username, Instant expiresAt) {}

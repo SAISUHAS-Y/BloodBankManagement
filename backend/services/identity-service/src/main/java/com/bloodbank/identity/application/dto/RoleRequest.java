@@ -1,17 +1,8 @@
 package com.bloodbank.identity.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RoleRequest {
-
-    @NotBlank(message = "Role name is required")
-    private String name;
-
-    private String description;
+/**
+ * @deprecated Use {@link com.bloodbank.identity.application.dto.request.RoleRequest} instead.
+ */
+@Deprecated
+public class RoleRequest extends com.bloodbank.identity.application.dto.request.RoleRequest {
 }

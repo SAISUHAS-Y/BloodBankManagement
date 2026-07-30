@@ -1,4 +1,4 @@
-package com.bloodbank.user.application.dto;
+package com.bloodbank.user.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,21 +21,17 @@ public class DonorProfileResponse implements Serializable {
     private LocalDate dob;
     private String genderCode;
     private String genderLabel;
-    
     private Long bloodGroupId;
     private String bloodGroupLabel;
-    
     private String phone;
     private String email;
     private String addressLine;
-    
     private Long stateId;
     private String stateName;
     private Long districtId;
     private String districtName;
     private Long cityId;
     private String cityName;
-    
     private String idType;
     private String idNumber;
     private String donorStatus;

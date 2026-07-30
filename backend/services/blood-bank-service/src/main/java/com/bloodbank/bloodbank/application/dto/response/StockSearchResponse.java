@@ -1,4 +1,4 @@
-package com.bloodbank.user.application.dto;
+package com.bloodbank.bloodbank.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,21 +6,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StaffProfileResponse implements Serializable {
+public class StockSearchResponse implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private Long identityUserId;
-    private String fullName;
-    private String designation;
     private Long bloodBankId;
     private String bloodBankName;
-    private Long hospitalId;
-    private String hospitalName;
+    private String stateName;
+    private String districtName;
+    private String cityName;
+    private String addressLine;
     private String phone;
+    private double unitsAvailable;
+    private Instant lastUpdatedAt;
 }

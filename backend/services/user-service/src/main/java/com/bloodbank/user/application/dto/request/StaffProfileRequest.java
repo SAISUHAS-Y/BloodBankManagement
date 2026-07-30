@@ -1,5 +1,6 @@
-package com.bloodbank.user.application.dto;
+package com.bloodbank.user.application.dto.request;
 
+import com.bloodbank.user.application.dto.validation.ValidationGroups;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class StaffProfileRequest {
 
+    @NotNull(groups = ValidationGroups.Create.class, message = "Identity user ID is required")
     @NotNull(message = "Identity user ID is required")
     private Long identityUserId;
 
@@ -27,4 +29,6 @@ public class StaffProfileRequest {
 
     @NotBlank(message = "Phone number is required")
     private String phone;
+
+    private Long reportingManagerId;
 }

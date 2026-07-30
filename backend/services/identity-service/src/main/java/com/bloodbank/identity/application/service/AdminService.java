@@ -1,14 +1,13 @@
 package com.bloodbank.identity.application.service;
 
 import com.bloodbank.common.contracts.dto.UserSummaryResponse;
-import com.bloodbank.identity.application.dto.AssignRoleRequest;
-import com.bloodbank.identity.application.dto.RegisterUserRequest;
-import com.bloodbank.identity.application.dto.RoleRequest;
-import com.bloodbank.identity.application.dto.RoleResponse;
-import com.bloodbank.identity.application.dto.PermissionResponse;
-
 import com.bloodbank.common.core.dto.PageResponse;
-import com.bloodbank.identity.application.dto.UserSearchRequest;
+import com.bloodbank.identity.application.dto.request.AssignRoleRequest;
+import com.bloodbank.identity.application.dto.request.RegisterUserRequest;
+import com.bloodbank.identity.application.dto.request.RoleRequest;
+import com.bloodbank.identity.application.dto.request.UserSearchRequest;
+import com.bloodbank.identity.application.dto.response.PermissionResponse;
+import com.bloodbank.identity.application.dto.response.RoleResponse;
 
 import java.util.List;
 

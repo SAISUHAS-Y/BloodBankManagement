@@ -1,13 +1,12 @@
 package com.bloodbank.identity.application.service;
 
-import com.bloodbank.identity.application.dto.ChangePasswordRequest;
-import com.bloodbank.identity.application.dto.LoginRequest;
-import com.bloodbank.identity.application.dto.LoginResponse;
-import com.bloodbank.identity.application.dto.RefreshTokenRequest;
-
-import com.bloodbank.identity.application.dto.ForgotPasswordRequest;
-import com.bloodbank.identity.application.dto.ResetPasswordRequest;
-import com.bloodbank.identity.application.dto.VerifyEmailRequest;
+import com.bloodbank.identity.application.dto.request.ChangePasswordRequest;
+import com.bloodbank.identity.application.dto.request.ForgotPasswordRequest;
+import com.bloodbank.identity.application.dto.request.LoginRequest;
+import com.bloodbank.identity.application.dto.request.RefreshTokenRequest;
+import com.bloodbank.identity.application.dto.request.ResetPasswordRequest;
+import com.bloodbank.identity.application.dto.request.VerifyEmailRequest;
+import com.bloodbank.identity.application.dto.response.LoginResponse;
 
 public interface AuthService {
     LoginResponse login(LoginRequest request, String ipAddress, String userAgent);

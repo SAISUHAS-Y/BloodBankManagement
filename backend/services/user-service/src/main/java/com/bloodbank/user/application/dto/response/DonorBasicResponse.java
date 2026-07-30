@@ -1,4 +1,4 @@
-package com.bloodbank.user.application.dto;
+package com.bloodbank.user.application.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +29,5 @@ public class DonorBasicResponse implements Serializable {
     private String cityName;
     private String donorStatus;
     private LocalDate lastDonationDate;
-    private Integer totalDonations;
+    private int totalDonations;
 }

@@ -1,10 +1,10 @@
 package com.bloodbank.identity.api.controller;
 
 import com.bloodbank.common.core.dto.ApiResponse;
-import com.bloodbank.identity.application.dto.MfaBackupCodesResponse;
-import com.bloodbank.identity.application.dto.MfaDisableRequest;
-import com.bloodbank.identity.application.dto.MfaEnableRequest;
-import com.bloodbank.identity.application.dto.MfaSetupResponse;
+import com.bloodbank.identity.application.dto.request.MfaDisableRequest;
+import com.bloodbank.identity.application.dto.request.MfaEnableRequest;
+import com.bloodbank.identity.application.dto.response.MfaBackupCodesResponse;
+import com.bloodbank.identity.application.dto.response.MfaSetupResponse;
 import com.bloodbank.identity.application.service.MfaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

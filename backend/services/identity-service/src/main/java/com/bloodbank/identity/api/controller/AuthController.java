@@ -1,11 +1,18 @@
 package com.bloodbank.identity.api.controller;
 
 import com.bloodbank.common.core.dto.ApiResponse;
-import com.bloodbank.identity.application.dto.ChangePasswordRequest;
-import com.bloodbank.identity.application.dto.LoginRequest;
-import com.bloodbank.identity.application.dto.LoginResponse;
-import com.bloodbank.identity.application.dto.RefreshTokenRequest;
+import com.bloodbank.identity.application.dto.request.ChangePasswordRequest;
+import com.bloodbank.identity.application.dto.request.ForgotPasswordRequest;
+import com.bloodbank.identity.application.dto.request.LoginRequest;
+import com.bloodbank.identity.application.dto.request.MfaVerifyRequest;
+import com.bloodbank.identity.application.dto.request.RefreshTokenRequest;
+import com.bloodbank.identity.application.dto.request.ResetPasswordRequest;
+import com.bloodbank.identity.application.dto.request.VerifyEmailRequest;
+import com.bloodbank.identity.application.dto.response.LoginResponse;
 import com.bloodbank.identity.application.service.AuthService;
+import com.bloodbank.identity.application.service.MfaService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,12 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
-
-import com.bloodbank.identity.application.dto.MfaVerifyRequest;
-import com.bloodbank.identity.application.service.MfaService;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -136,21 +137,21 @@ public class AuthController {
 
     @PostMapping("/forgot-password")
     @Operation(summary = "Send Password Reset Email", description = "Request a password reset link to your email")
-    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody com.bloodbank.identity.application.dto.ForgotPasswordRequest request) {
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
         authService.forgotPassword(request);
         return ResponseEntity.ok(ApiResponse.success("If the email is registered, a password reset token has been dispatched", null));
     }
 
     @PostMapping("/reset-password")
     @Operation(summary = "Reset Password Using Link", description = "Set a new password using the reset link token")
-    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody com.bloodbank.identity.application.dto.ResetPasswordRequest request) {
+    public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
         return ResponseEntity.ok(ApiResponse.success("Password has been reset successfully", null));
     }
 
     @PostMapping("/verify-email")
     @Operation(summary = "Verify Email Address", description = "Confirm and verify your email address")
-    public ResponseEntity<ApiResponse<Void>> verifyEmail(@Valid @RequestBody com.bloodbank.identity.application.dto.VerifyEmailRequest request) {
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
         authService.verifyEmail(request);
         return ResponseEntity.ok(ApiResponse.success("Email address verified successfully", null));
     }

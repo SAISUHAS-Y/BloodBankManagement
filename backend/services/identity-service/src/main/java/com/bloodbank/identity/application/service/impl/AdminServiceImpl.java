@@ -2,27 +2,38 @@ package com.bloodbank.identity.application.service.impl;
 
 import com.bloodbank.common.contracts.dto.UserSummaryResponse;
 import com.bloodbank.common.events.user.UserRegisteredEvent;
+import com.bloodbank.common.exception.BusinessRuleViolationException;
+import com.bloodbank.common.exception.DuplicateResourceException;
 import com.bloodbank.common.exception.InvalidInputException;
 import com.bloodbank.common.exception.ResourceNotFoundException;
-import com.bloodbank.identity.application.dto.AssignRoleRequest;
-import com.bloodbank.identity.application.dto.PermissionResponse;
-import com.bloodbank.identity.application.dto.RegisterUserRequest;
-import com.bloodbank.identity.application.dto.RoleRequest;
-import com.bloodbank.identity.application.dto.RoleResponse;
+import com.bloodbank.common.exception.enums.ErrorCode;
+import com.bloodbank.common.security.audit.SecurityAuditLogger;
+import com.bloodbank.identity.application.dto.request.AssignRoleRequest;
+import com.bloodbank.identity.application.dto.request.RegisterUserRequest;
+import com.bloodbank.identity.application.dto.request.RoleRequest;
+import com.bloodbank.identity.application.dto.request.UserSearchRequest;
+import com.bloodbank.identity.application.dto.response.PermissionResponse;
+import com.bloodbank.identity.application.dto.response.RoleResponse;
 import com.bloodbank.identity.application.event.UserEventPublisher;
 import com.bloodbank.identity.application.service.AdminService;
+import com.bloodbank.identity.domain.entity.AuthAuditLog;
 import com.bloodbank.identity.domain.entity.Permission;
 import com.bloodbank.identity.domain.entity.Role;
 import com.bloodbank.identity.domain.entity.RolePermission;
 import com.bloodbank.identity.domain.entity.User;
 import com.bloodbank.identity.domain.entity.UserRole;
+import com.bloodbank.identity.domain.enums.AuthEventType;
+import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
 import com.bloodbank.identity.domain.repository.PermissionRepository;
 import com.bloodbank.identity.domain.repository.RolePermissionRepository;
 import com.bloodbank.identity.domain.repository.RoleRepository;
 import com.bloodbank.identity.domain.repository.UserRepository;
 import com.bloodbank.identity.domain.repository.UserRoleRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,16 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import com.bloodbank.common.exception.BusinessRuleViolationException;
-import com.bloodbank.common.exception.DuplicateResourceException;
-import com.bloodbank.common.exception.enums.ErrorCode;
-import com.bloodbank.common.security.audit.SecurityAuditLogger;
-import com.bloodbank.identity.domain.entity.AuthAuditLog;
-import com.bloodbank.identity.domain.enums.AuthEventType;
-import com.bloodbank.identity.domain.repository.AuthAuditLogRepository;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 
 @Service
 @RequiredArgsConstructor
@@ -157,7 +158,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     @Transactional(readOnly = true)
-    public com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse> searchUsers(com.bloodbank.identity.application.dto.UserSearchRequest request) {
+    public com.bloodbank.common.core.dto.PageResponse<UserSummaryResponse> searchUsers(UserSearchRequest request) {
         org.springframework.data.domain.Sort sort = org.springframework.data.domain.Sort.by(
                 "ASC".equalsIgnoreCase(request.getSortDirection()) ? org.springframework.data.domain.Sort.Direction.ASC : org.springframework.data.domain.Sort.Direction.DESC,
                 request.getSortBy() != null ? request.getSortBy() : "createdAt"
@@ -237,7 +238,6 @@ public class AdminServiceImpl implements AdminService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + id));
 
-        // Zero-Admin Prevention Check
         long remainingAdmins = userRoleRepository.countActiveUsersWithPermission("USER_MANAGE");
         if (remainingAdmins <= 1 && getUserPermissionCodes(user).contains("USER_MANAGE")) {
             throw new BusinessRuleViolationException("Cannot delete user as it would leave zero active users with administrative privileges.", ErrorCode.LAST_ADMIN_REVOCATION_PREVENTED);
@@ -295,7 +295,6 @@ public class AdminServiceImpl implements AdminService {
             throw new InvalidInputException("Cannot delete system role: " + role.getName());
         }
 
-        // Prevent deleting a Role if any active User currently holds it:
         if (userRoleRepository.existsByRoleId(id)) {
             log.warn("Attempted to delete role ID {} which is currently assigned to users.", id);
             throw new DuplicateResourceException("Role cannot be deleted while assigned to active users.", ErrorCode.ROLE_IN_USE);
@@ -327,7 +326,6 @@ public class AdminServiceImpl implements AdminService {
             userRoleRepository.save(ur);
         }
 
-        // Zero-Admin Prevention Check after role reassignment
         long activeAdmins = userRoleRepository.countActiveUsersWithPermission("USER_MANAGE");
         if (activeAdmins == 0) {
             throw new BusinessRuleViolationException("Cannot complete role revocation as it leaves zero active users with administrative privileges.", ErrorCode.LAST_ADMIN_REVOCATION_PREVENTED);
@@ -372,7 +370,6 @@ public class AdminServiceImpl implements AdminService {
             rolePermissionRepository.save(rp);
         }
 
-        // Zero-Admin Prevention Check after permission reassignment
         long activeAdmins = userRoleRepository.countActiveUsersWithPermission("USER_MANAGE");
         if (activeAdmins == 0) {
             throw new BusinessRuleViolationException("Cannot complete permission revocation as it leaves zero active users with administrative privileges.", ErrorCode.LAST_ADMIN_REVOCATION_PREVENTED);

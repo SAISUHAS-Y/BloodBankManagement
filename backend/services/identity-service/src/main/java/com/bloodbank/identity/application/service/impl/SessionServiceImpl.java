@@ -1,7 +1,7 @@
 package com.bloodbank.identity.application.service.impl;
 
 import com.bloodbank.common.exception.ResourceNotFoundException;
-import com.bloodbank.identity.application.dto.SessionDetailsResponse;
+import com.bloodbank.identity.application.dto.response.SessionDetailsResponse;
 import com.bloodbank.identity.application.service.SessionService;
 import com.bloodbank.identity.domain.entity.User;
 import com.bloodbank.identity.domain.entity.UserSession;

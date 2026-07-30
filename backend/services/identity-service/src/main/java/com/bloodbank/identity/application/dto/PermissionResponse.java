@@ -1,20 +1,8 @@
 package com.bloodbank.identity.application.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PermissionResponse {
-    private Long id;
-    private String code;
-    private String displayName;
-    private String description;
-    private String module;
-    private String category;
-    private String permissionGroup;
+/**
+ * @deprecated Use {@link com.bloodbank.identity.application.dto.response.PermissionResponse} instead.
+ */
+@Deprecated
+public class PermissionResponse extends com.bloodbank.identity.application.dto.response.PermissionResponse {
 }

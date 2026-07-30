@@ -1,7 +1,7 @@
 package com.bloodbank.identity.api.controller;
 
 import com.bloodbank.common.core.dto.ApiResponse;
-import com.bloodbank.identity.application.dto.SessionDetailsResponse;
+import com.bloodbank.identity.application.dto.response.SessionDetailsResponse;
 import com.bloodbank.identity.application.service.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

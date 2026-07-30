@@ -1,7 +1,7 @@
 package com.bloodbank.bloodbank.application.service;
 
-import com.bloodbank.bloodbank.application.dto.BloodStockResponse;
-import com.bloodbank.bloodbank.application.dto.StockSearchResponse;
+import com.bloodbank.bloodbank.application.dto.response.BloodStockResponse;
+import com.bloodbank.bloodbank.application.dto.response.StockSearchResponse;
 
 import java.util.List;
 

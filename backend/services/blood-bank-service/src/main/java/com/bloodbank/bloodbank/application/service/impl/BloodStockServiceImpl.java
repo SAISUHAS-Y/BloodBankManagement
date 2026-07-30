@@ -1,19 +1,19 @@
 package com.bloodbank.bloodbank.application.service.impl;
 
-import com.bloodbank.common.exception.InvalidInputException;
-import com.bloodbank.common.exception.ResourceNotFoundException;
-import com.bloodbank.common.contracts.client.MasterServiceClient;
-import com.bloodbank.common.contracts.dto.BloodGroupContractResponse;
-import com.bloodbank.bloodbank.application.dto.BloodStockResponse;
-import com.bloodbank.bloodbank.application.dto.StockSearchResponse;
+import com.bloodbank.bloodbank.application.dto.response.BloodStockResponse;
+import com.bloodbank.bloodbank.application.dto.response.StockSearchResponse;
 import com.bloodbank.bloodbank.application.service.BloodStockService;
 import com.bloodbank.bloodbank.domain.entity.BloodStock;
+import com.bloodbank.bloodbank.domain.entity.ProcessedStockTransaction;
 import com.bloodbank.bloodbank.domain.entity.StockAdjustmentLog;
 import com.bloodbank.bloodbank.domain.repository.BloodStockRepository;
-import com.bloodbank.bloodbank.domain.repository.StockAdjustmentLogRepository;
 import com.bloodbank.bloodbank.domain.repository.ProcessedStockTransactionRepository;
-import com.bloodbank.bloodbank.domain.entity.ProcessedStockTransaction;
+import com.bloodbank.bloodbank.domain.repository.StockAdjustmentLogRepository;
+import com.bloodbank.common.contracts.client.MasterServiceClient;
+import com.bloodbank.common.contracts.dto.BloodGroupContractResponse;
 import com.bloodbank.common.contracts.dto.BloodStockAdjustRequest;
+import com.bloodbank.common.exception.InvalidInputException;
+import com.bloodbank.common.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
